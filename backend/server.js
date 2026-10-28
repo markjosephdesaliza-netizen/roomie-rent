@@ -388,7 +388,8 @@ app.post('/api/auth/forgot-password', async (req, res) => {
     }
 
     const resetToken = Math.random().toString(36).substring(2) + Date.now().toString(36);
-    const resetLink = `http://localhost:${port}/reset-password.html?token=${resetToken}&email=${encodeURIComponent(email)}`;
+    const frontendUrl = process.env.FRONTEND_URL || 'https://roomie-rent.netlify.app';
+    const resetLink = `${frontendUrl}/reset-password.html?token=${resetToken}&email=${encodeURIComponent(email)}`;
 
     const mailOptions = {
       from: '"Roomie Rent Support" <support@roomierent.com>',
