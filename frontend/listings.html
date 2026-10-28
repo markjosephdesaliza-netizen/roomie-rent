@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roomie Rent - Explore Available Rooms</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Plus Jakarta Sans for UI, Playfair Display for accents -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .font-serif-custom { font-family: 'Playfair Display', serif; }
+    .text-terracotta { color: #C85A32; }
+    .bg-terracotta { background-color: #C85A32; }
+    .bg-terracotta-hover:hover { background-color: #B24E2A; }
+    .border-terracotta { border-color: #C85A32; }
+    .focus-ring-terracotta:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(200, 90, 50, 0.25);
+    }
+    
+    /* Custom Range Slider styling */
+    input[type=range] {
+      -webkit-appearance: none;
+      appearance: none;
+      background: #E2E8F0;
+      height: 6px;
+      border-radius: 9999px;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 18px;
+      width: 18px;
+      border-radius: 50%;
+      background: #C85A32;
+      cursor: pointer;
+      border: 3px solid #FFFFFF;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+      transition: transform 0.15s ease;
+    }
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col selection:bg-rose-100 selection:text-terracotta">
+
+  <!-- TOP NAVIGATION HEADER -->
+  <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 md:px-10 py-3.5 flex items-center justify-between">
+    <div class="flex items-center space-x-6">
+      <a href="index.html" class="flex items-center space-x-2.5 group">
+        <div class="w-9 h-9 rounded-xl bg-terracotta flex items-center justify-center text-white shadow-md shadow-terracotta/20 group-hover:scale-105 transition-transform">
+          <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20">
+            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l1.293 1.293a1 1 0 001.414-1.414l-7-7z"/>
+          </svg>
+        </div>
+        <span class="font-bold text-lg tracking-tight text-slate-900">Roomie<span class="text-terracotta">Rent</span></span>
+      </a>
+
+      <a href="index.html" class="hidden sm:flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-terracotta bg-slate-100 hover:bg-orange-50 px-3 py-1.5 rounded-xl transition">
+        <svg class="w-3.5 h-3.5 stroke-2 stroke-current" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+        <span>Back to Home Page</span>
+      </a>
+    </div>
+
+    <!-- User Profile Header Avatar & Dashboard / Auth Actions -->
+    <div id="nav-user-container" class="flex items-center space-x-3 sm:space-x-4">
+      
+      <!-- DYNAMIC DASHBOARD BUTTON -->
+      <a id="nav-dashboard-btn" href="login.html" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5">
+        <svg class="w-3.5 h-3.5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+        <span id="nav-dashboard-text">Dashboard</span>
+      </a>
+
+      <div id="user-info-wrapper" class="flex items-center space-x-3">
+        <div id="user-avatar-container" class="w-8 h-8 rounded-full bg-slate-900 text-white font-bold text-xs flex items-center justify-center overflow-hidden">
+          <span id="user-avatar-initial">U</span>
+        </div>
+        <span id="user-display-name" class="text-xs font-bold text-slate-800 hidden sm:inline">Loading...</span>
+        <button onclick="handleLogout()" class="text-xs font-semibold text-slate-400 hover:text-rose-600 transition">Log Out</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN PAGE WRAPPER -->
+  <div class="flex-1 flex max-w-[1440px] mx-auto w-full relative">
+
+    <!-- LEFT SIDEBAR: FILTERS -->
+    <aside id="filter-sidebar" class="w-80 bg-white border-r border-slate-200/80 p-6 shrink-0 hidden md:block sticky top-[65px] h-[calc(100vh-65px)] overflow-y-auto">
+      <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+        <h2 class="font-bold text-lg text-slate-900 tracking-tight">Filter Rooms</h2>
+        <button onclick="resetFilters()" class="text-xs font-semibold text-terracotta hover:underline transition uppercase tracking-wider">Reset All</button>
+      </div>
+
+      <!-- KEYWORD SEARCH -->
+      <div class="mb-6">
+        <label class="block text-[10px] font-bold text-slate-400 tracking-widest uppercase mb-2">Search Keyword</label>
+        <div class="relative">
+          <input type="text" id="filter-search" oninput="applyFilters()" placeholder="e.g. Condo, Studio..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 pl-9 text-xs font-medium text-slate-800 outline-none focus-ring-terracotta transition">
+          <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </div>
+      </div>
+
+      <!-- LOCATION & TYPE SELECTORS -->
+      <div class="mb-6 space-y-3">
+        <label class="block text-[10px] font-bold text-slate-400 tracking-widest uppercase">City & Type</label>
+        
+        <div class="relative">
+          <select id="filter-city" onchange="applyFilters()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-slate-700 outline-none focus-ring-terracotta transition cursor-pointer appearance-none">
+            <option value="all">All Metro Manila Cities</option>
+            <option value="Caloocan City">Caloocan City</option>
+            <option value="Las Piñas City">Las Piñas City</option>
+            <option value="Makati City">Makati City</option>
+            <option value="Malabon City">Malabon City</option>
+            <option value="Mandaluyong City">Mandaluyong City</option>
+            <option value="Manila">Manila</option>
+            <option value="Marikina City">Marikina City</option>
+            <option value="Muntinlupa City">Muntinlupa City</option>
+            <option value="Navotas City">Navotas City</option>
+            <option value="Parañaque City">Parañaque City</option>
+            <option value="Pasay City">Pasay City</option>
+            <option value="Pasig City">Pasig City</option>
+            <option value="Pateros">Pateros</option>
+            <option value="Quezon City">Quezon City</option>
+            <option value="San Juan City">San Juan City</option>
+            <option value="Taguig / BGC">Taguig / BGC</option>
+            <option value="Valenzuela City">Valenzuela City</option>
+          </select>
+          <svg class="w-4 h-4 text-slate-400 absolute right-3 top-3 pointer-events-none stroke-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
+        </div>
+
+        <div class="relative">
+          <select id="filter-type" onchange="applyFilters()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-slate-700 outline-none focus-ring-terracotta transition cursor-pointer appearance-none">
+            <option value="all">All Property Types</option>
+            <option value="studio">Solo Studio</option>
+            <option value="bedspace">Bedspace</option>
+            <option value="condo">Condo Suite</option>
+            <option value="room">Private Room</option>
+          </select>
+          <svg class="w-4 h-4 text-slate-400 absolute right-3 top-3 pointer-events-none stroke-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
+        </div>
+      </div>
+
+      <!-- MAX RENT RANGE SLIDER -->
+      <div class="mb-6 pb-6 border-b border-slate-100">
+        <div class="flex justify-between items-baseline mb-2">
+          <label class="block text-[10px] font-bold text-slate-400 tracking-widest uppercase">Max Monthly Budget</label>
+          <span id="budget-value" class="text-sm font-bold text-terracotta">₱25,000</span>
+        </div>
+        <input type="range" id="filter-budget" min="2000" max="25000" step="500" value="25000" oninput="updateBudgetDisplay(this.value); applyFilters();" class="w-full cursor-pointer mt-1">
+        <div class="flex justify-between text-[10px] font-medium text-slate-400 mt-2">
+          <span>₱2,000</span>
+          <span>₱25,000+</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- RIGHT MAIN CONTENT: LISTINGS GALLERY -->
+    <main class="flex-1 p-6 md:p-8">
+      
+      <!-- TOP CONTROL & SORT BAR -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4 pb-4 border-b border-slate-200/80">
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Available Rooms</h1>
+          <p class="text-xs text-slate-500 font-medium mt-1">Showing <span id="listings-count" class="font-bold text-slate-800">0 curated spaces</span> ready for move-in</p>
+        </div>
+        
+        <div class="flex items-center justify-between sm:justify-end gap-3">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-semibold text-slate-400 hidden sm:inline">Sort by:</span>
+            <div class="relative">
+              <select id="sort-order" onchange="applyFilters()" class="bg-white border border-slate-200 rounded-xl px-3.5 py-2 pr-8 text-xs font-semibold text-slate-700 shadow-sm outline-none focus-ring-terracotta transition cursor-pointer appearance-none">
+                <option value="low-high">Price: Low to High</option>
+                <option value="high-low">Price: High to Low</option>
+              </select>
+              <svg class="w-3.5 h-3.5 text-slate-400 absolute right-3 top-2.5 pointer-events-none stroke-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARDS GRID -->
+      <div id="listings-gallery" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Dynamically injected room cards -->
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- SCRIPT CONTROLLER -->
+  <script>
+    const API_BASE_URL = 'http://localhost:5000/api';
+    let allListings = [];
+    let currentUser = null;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const storedUser = localStorage.getItem('user');
+      if (!storedUser) {
+        alert('Please log in or register to browse room listings.');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      currentUser = JSON.parse(storedUser);
+      
+      const displayName = currentUser.full_name || currentUser.name || 'User';
+      document.getElementById('user-display-name').innerText = displayName;
+
+      const avatarContainer = document.getElementById('user-avatar-container');
+      if (currentUser.profile_image) {
+        avatarContainer.innerHTML = `<img src="${currentUser.profile_image}" class="w-full h-full object-cover">`;
+      } else {
+        document.getElementById('user-avatar-initial').innerText = displayName.charAt(0).toUpperCase();
+      }
+
+      const dashBtn = document.getElementById('nav-dashboard-btn');
+      const dashText = document.getElementById('nav-dashboard-text');
+
+      if (currentUser.role === 'admin') {
+        dashBtn.href = 'admin-dashboard.html';
+        dashText.innerText = 'My Dashboard';
+      } else if (currentUser.role === 'landlord') {
+        dashBtn.href = 'landlord-dashboard.html';
+        dashText.innerText = 'My Dashboard';
+      } else {
+        dashBtn.href = 'renter-dashboard.html';
+        dashText.innerText = 'My Dashboard';
+      }
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const cityParam = urlParams.get('city');
+      const typeParam = urlParams.get('type');
+
+      if (cityParam) {
+        document.getElementById('filter-city').value = cityParam;
+      }
+      if (typeParam) {
+        document.getElementById('filter-type').value = typeParam;
+      }
+
+      fetchListings();
+    });
+
+    function handleLogout() {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      window.location.href = 'login.html';
+    }
+
+    async function fetchListings() {
+      const gallery = document.getElementById('listings-gallery');
+      try {
+        const response = await fetch(`${API_BASE_URL}/listings`);
+        if (!response.ok) throw new Error('Failed to fetch listings');
+        const rawListings = await response.json();
+
+        allListings = rawListings.filter(room => room.status !== 'rented' && room.status !== 'unavailable');
+
+        if (currentUser && currentUser.role === 'renter') {
+          const storageKey = `saved_rooms_${currentUser.id}`;
+          let favorites = JSON.parse(localStorage.getItem(storageKey)) || [];
+          const validFavorites = favorites.filter(fav => {
+            const matched = rawListings.find(r => r.id === fav.id);
+            return matched && matched.status !== 'rented' && matched.status !== 'unavailable';
+          });
+          localStorage.setItem(storageKey, JSON.stringify(validFavorites));
+        }
+
+        applyFilters();
+      } catch (err) {
+        gallery.innerHTML = `
+          <div class="col-span-full bg-white border border-slate-200 rounded-2xl p-12 text-center shadow-sm">
+            <div class="w-12 h-12 rounded-full bg-orange-50 text-terracotta flex items-center justify-center mx-auto mb-3 font-bold text-lg">🏠</div>
+            <h3 class="font-bold text-slate-900 text-base mb-1">No rooms available right now</h3>
+            <p class="text-slate-500 text-xs max-w-sm mx-auto mb-4">The platform is fresh! Landlords will post available rooms soon.</p>
+          </div>
+        `;
+        document.getElementById('listings-count').innerText = '0 curated spaces';
+      }
+    }
+
+    function applyFilters() {
+      const searchVal = document.getElementById('filter-search').value.toLowerCase().trim();
+      const cityVal = document.getElementById('filter-city').value;
+      const typeVal = document.getElementById('filter-type').value;
+      const budgetVal = parseFloat(document.getElementById('filter-budget').value);
+      const sortVal = document.getElementById('sort-order').value;
+
+      let filtered = allListings.filter(item => {
+        const matchesSearch = !searchVal || 
+          (item.title && item.title.toLowerCase().includes(searchVal)) || 
+          (item.city && item.city.toLowerCase().includes(searchVal)) ||
+          (item.description && item.description.toLowerCase().includes(searchVal));
+
+        const matchesCity = cityVal === 'all' || item.city === cityVal;
+        const matchesType = typeVal === 'all' || item.property_type === typeVal;
+        const matchesBudget = parseFloat(item.price) <= budgetVal;
+
+        return matchesSearch && matchesCity && matchesType && matchesBudget;
+      });
+
+      if (sortVal === 'low-high') {
+        filtered.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+      } else if (sortVal === 'high-low') {
+        filtered.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
+      }
+
+      renderGallery(filtered);
+    }
+
+    function renderGallery(listings) {
+      const gallery = document.getElementById('listings-gallery');
+      document.getElementById('listings-count').innerText = `${listings.length} space${listings.length === 1 ? '' : 's'}`;
+
+      if (listings.length === 0) {
+        gallery.innerHTML = `
+          <div class="col-span-full bg-white border border-slate-200 rounded-2xl p-12 text-center shadow-sm">
+            <div class="w-12 h-12 rounded-full bg-orange-50 text-terracotta flex items-center justify-center mx-auto mb-3 font-bold text-lg">🏠</div>
+            <h3 class="font-bold text-slate-900 text-base mb-1">No rooms match your filter</h3>
+            <p class="text-slate-500 text-xs max-w-sm mx-auto mb-4">Try adjusting your location city or raising your budget range.</p>
+            <button onclick="resetFilters()" class="inline-block bg-terracotta text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-sm hover:bg-terracotta-hover transition">Reset Filters</button>
+          </div>
+        `;
+        return;
+      }
+
+      const isRenter = currentUser && currentUser.role === 'renter';
+      const storageKey = isRenter ? `saved_rooms_${currentUser.id}` : null;
+      const favorites = isRenter ? (JSON.parse(localStorage.getItem(storageKey)) || []) : [];
+
+      gallery.innerHTML = listings.map(room => {
+        let mainImg = 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80';
+        if (room.image_url) {
+          try {
+            const parsed = JSON.parse(room.image_url);
+            if (Array.isArray(parsed) && parsed.length > 0) mainImg = parsed[0];
+            else mainImg = room.image_url;
+          } catch(e) {
+            mainImg = room.image_url;
+          }
+        }
+
+        const roomDetailUrl = `room-detail.html?id=${room.id}`;
+        const isSaved = favorites.some(fav => fav.id === room.id);
+
+        return `
+          <div class="group bg-white rounded-2xl border border-slate-200/90 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+            <div>
+              <a href="${roomDetailUrl}" class="block relative h-52 overflow-hidden bg-slate-100 cursor-pointer">
+                <img src="${mainImg}" alt="${room.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                
+                <!-- BOOKMARK HEART BUTTON (Visible ONLY for Renters with individual user storage) -->
+                ${isRenter ? `
+                  <button type="button" onclick="event.preventDefault(); event.stopPropagation(); saveRoomToFavorites(${JSON.stringify(room).replace(/"/g, '&quot;')}, this)" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-slate-600 hover:text-terracotta transition shadow-sm z-10" title="Bookmark Room">
+                    <svg class="w-4 h-4 ${isSaved ? 'fill-terracotta text-terracotta' : 'fill-none text-slate-600'} stroke-current stroke-2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                  </button>
+                ` : ''}
+
+                <span class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-semibold px-2.5 py-1 rounded-md">
+                  Verified Listing
+                </span>
+              </a>
+
+              <div class="p-5">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="bg-orange-50 text-terracotta text-[10px] font-bold px-2.5 py-0.5 rounded-md uppercase tracking-wider">${room.property_type || 'Room'}</span>
+                  <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">• ${room.city || 'Metro Manila'}</span>
+                </div>
+
+                <a href="${roomDetailUrl}" class="font-bold text-slate-900 text-base mb-1.5 group-hover:text-terracotta transition-colors block line-clamp-1">${room.title}</a>
+                <p class="text-xs text-slate-500 font-medium mb-2 line-clamp-2">${room.description || 'Verified rental room ready for move-in.'}</p>
+                
+                ${room.latitude && room.longitude ? `
+                  <div class="text-[11px] font-bold text-emerald-600 flex items-center gap-1 mb-2">
+                    <span>📍 GPS Pinned Location</span>
+                  </div>
+                ` : ''}
+
+                ${room.house_rules ? `
+                  <div class="bg-slate-50 border border-slate-100 rounded-xl p-2.5 text-[11px] text-slate-600 mb-2">
+                    <span class="font-bold text-slate-700">House Rules:</span> <span class="line-clamp-1">${room.house_rules}</span>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+
+            <div class="p-5 pt-0">
+              <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+                <div>
+                  <span class="text-terracotta text-2xl font-extrabold tracking-tight">₱${Number(room.price).toLocaleString()}</span>
+                  <span class="text-xs font-normal text-slate-400">/mo</span>
+                </div>
+                <a href="${roomDetailUrl}" class="bg-slate-900 hover:bg-terracotta text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition-all shadow-sm inline-block">
+                  View Details
+                </a>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function saveRoomToFavorites(room, btn) {
+      if (!currentUser || currentUser.role !== 'renter') return;
+      const storageKey = `saved_rooms_${currentUser.id}`; // FIXED: User-specific storage key
+      let favorites = JSON.parse(localStorage.getItem(storageKey)) || [];
+      const exists = favorites.some(fav => fav.id === room.id);
+
+      const svg = btn.querySelector('svg');
+
+      if (!exists) {
+        favorites.push(room);
+        localStorage.setItem(storageKey, JSON.stringify(favorites));
+        svg.classList.add('fill-terracotta', 'text-terracotta');
+        svg.classList.remove('fill-none', 'text-slate-600');
+        alert('Room saved to your Renter Dashboard favorites!');
+      } else {
+        favorites = favorites.filter(fav => fav.id !== room.id);
+        localStorage.setItem(storageKey, JSON.stringify(favorites));
+        svg.classList.remove('fill-terracotta', 'text-terracotta');
+        svg.classList.add('fill-none', 'text-slate-600');
+        alert('Room removed from saved favorites.');
+      }
+    }
+
+    function updateBudgetDisplay(val) {
+      document.getElementById('budget-value').innerText = '₱' + parseInt(val).toLocaleString();
+    }
+
+    function resetFilters() {
+      document.getElementById('filter-search').value = '';
+      document.getElementById('filter-city').value = 'all';
+      document.getElementById('filter-type').value = 'all';
+      document.getElementById('filter-budget').value = '25000';
+      updateBudgetDisplay(25000);
+      applyFilters();
+    }
+  </script>
+</body>
+</html>

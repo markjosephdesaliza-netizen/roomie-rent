@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Room Details - Roomie Rent</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .font-serif-custom {
+      font-family: 'Playfair Display', serif;
+    }
+
+    .text-terracotta {
+      color: #C85A32;
+    }
+
+    .bg-terracotta {
+      background-color: #C85A32;
+    }
+
+    .bg-terracotta-hover:hover {
+      background-color: #B24E2A;
+    }
+
+    .border-terracotta {
+      border-color: #C85A32;
+    }
+
+    .focus-ring-terracotta:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(200, 90, 50, 0.25);
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen selection:bg-rose-100 selection:text-terracotta">
+
+<!-- TOP HEADER WITH BACK TO HOMEPAGE ON THE LEFT BESIDE LOGO -->
+  <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 md:px-10 py-3.5 flex items-center justify-between">
+    
+    <!-- LEFT GROUP: BRAND LOGO + BACK TO HOMEPAGE BUTTON -->
+    <div class="flex items-center space-x-6">
+      <!-- BRAND LOGO -->
+      <a href="index.html" class="flex items-center space-x-2.5 group">
+        <div class="w-9 h-9 rounded-xl bg-terracotta flex items-center justify-center text-white shadow-md shadow-terracotta/20 group-hover:scale-105 transition-transform duration-300">
+          <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20">
+            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l1.293 1.293a1 1 0 001.414-1.414l-7-7z"/>
+          </svg>
+        </div>
+        <span class="font-bold text-lg tracking-tight text-slate-900">
+          Roomie<span class="text-terracotta">Rent</span>
+        </span>
+      </a>
+
+      <!-- BACK TO HOMEPAGE BUTTON (POSITIONED BESIDE LOGO) -->
+      <a href="index.html" class="flex items-center gap-1.5 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200/80 hover:text-slate-900 px-3.5 py-1.5 rounded-xl transition">
+        <svg class="w-3.5 h-3.5 stroke-2 stroke-current" fill="none" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
+        </svg>
+        <span>Back to Home Page</span>
+      </a>
+    </div>
+
+    <!-- RIGHT GROUP: LISTINGS + MY DASHBOARD BUTTONS -->
+    <div class="flex items-center space-x-2.5">
+      <!-- ALL LISTINGS BUTTON -->
+      <a href="listings.html" class="flex items-center gap-1.5 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200/80 hover:text-slate-900 px-3.5 py-1.5 rounded-xl transition">
+        <svg class="w-3.5 h-3.5 stroke-2 stroke-current fill-none" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6h16.5M3.75 12h16.5m-16.5 6h16.5"/>
+        </svg>
+        <span>Listings</span>
+      </a>
+
+      <!-- MY DASHBOARD BUTTON (Dynamic Route) -->
+      <a id="header-dashboard-btn" href="login.html" class="flex items-center gap-1.5 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200/80 hover:text-slate-900 px-3.5 py-1.5 rounded-xl transition">
+        <svg class="w-3.5 h-3.5 stroke-2 stroke-current fill-none" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+        </svg>
+        <span>My Dashboard</span>
+      </a>
+    </div>
+
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <nav class="flex items-center space-x-2 text-xs font-semibold text-slate-400 mb-6">
+      <a href="index.html" class="hover:text-slate-800 transition">Home</a>
+      <span>/</span>
+      <a href="listings.html" id="breadcrumb-city" class="hover:text-slate-800 transition">Metro Manila</a>
+      <span>/</span>
+      <span id="breadcrumb-title" class="text-slate-800 font-bold">Room Details</span>
+    </nav>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+      <div class="lg:col-span-8 space-y-6">
+
+        <div class="relative w-full h-[360px] sm:h-[440px] rounded-3xl overflow-hidden shadow-sm bg-slate-100 border border-slate-200/80 group cursor-pointer">
+          <img
+            id="main-image"
+            src=""
+            alt="Room view"
+            class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+          />
+
+          <div class="absolute inset-0 bg-slate-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+
+          <span class="absolute top-4 left-4 bg-slate-900/80 backdrop-blur-md text-white text-xs font-semibold px-3 py-1.5 rounded-lg border border-white/10 shadow-sm">
+            Verified Property
+          </span>
+        </div>
+
+        <div id="gallery-thumbnails" class="flex gap-3 overflow-x-auto pb-2 hidden"></div>
+
+        <div class="flex flex-wrap items-start justify-between gap-4 pt-2">
+          <div>
+            <div id="room-city-badge" class="flex items-center gap-1.5 text-xs font-bold text-terracotta uppercase tracking-wider mb-1">
+              Metro Manila
+            </div>
+
+            <h1 id="room-title-heading" class="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">
+              Loading Room Details...
+            </h1>
+
+            <p id="room-status-subtitle" class="text-xs text-slate-500 font-medium mt-1">
+              Verified room listing available for move-in
+            </p>
+          </div>
+
+          <span id="room-status-badge" class="px-3.5 py-1.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80 shadow-sm flex items-center gap-1.5">
+            <span id="room-status-dot" class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+            <span id="room-status-text">Available Now</span>
+          </span>
+        </div>
+
+        <div class="border-b border-slate-200 pt-4">
+          <nav class="flex space-x-8 text-sm font-bold">
+            <button onclick="switchTab('tab-details')" id="btn-tab-details" class="tab-btn text-terracotta border-b-2 border-terracotta pb-3 transition duration-200">
+              Details & Inclusions
+            </button>
+
+            <button onclick="switchTab('tab-rules')" id="btn-tab-rules" class="tab-btn text-slate-400 hover:text-slate-800 pb-3 transition duration-200">
+              House Rules
+            </button>
+          </nav>
+        </div>
+
+        <div id="tab-details" class="tab-content space-y-6 pt-2">
+          <div>
+            <h3 class="font-bold text-slate-900 text-lg mb-2">
+              Room Overview
+            </h3>
+
+            <p id="room-description" class="text-slate-600 text-xs sm:text-sm leading-relaxed whitespace-pre-line">
+              Loading description...
+            </p>
+          </div>
+
+          <div class="pt-2">
+            <h3 class="font-bold text-slate-900 text-lg mb-2">
+              Property GPS Location
+            </h3>
+
+            <div id="map-container" class="w-full h-[300px] rounded-2xl border border-slate-200 shadow-sm overflow-hidden z-10"></div>
+
+            <p id="map-status-text" class="text-[11px] text-slate-400 mt-2 font-medium">
+              Loading map coordinates...
+            </p>
+          </div>
+        </div>
+
+        <div id="tab-rules" class="tab-content hidden space-y-4 pt-2">
+          <h3 class="font-bold text-slate-900 text-lg mb-2">
+            House Rules & Terms
+          </h3>
+
+          <p id="room-house-rules" class="text-slate-600 text-xs sm:text-sm leading-relaxed whitespace-pre-line">
+            No specific house rules specified by the landlord.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="lg:col-span-4 sticky top-20">
+
+        <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-xl shadow-slate-200/50 space-y-6">
+
+          <div>
+            <div class="flex items-baseline gap-1">
+              <span id="room-price-display" class="text-3xl font-extrabold text-terracotta tracking-tight">
+                ₱0
+              </span>
+
+              <span class="text-xs font-semibold text-slate-400">
+                / month
+              </span>
+            </div>
+
+            <p class="text-xs font-medium text-slate-400 mt-1">
+              1 Month Advance + Security Deposit
+            </p>
+          </div>
+
+          <!-- LANDLORD DETAILS CARD -->
+          <div class="flex items-center space-x-3 pt-1 pb-1 border-t border-b border-slate-100">
+            <div id="landlord-avatar" class="w-10 h-10 rounded-full bg-terracotta text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
+              <span id="landlord-initial">L</span>
+            </div>
+
+            <div>
+              <h4 id="landlord-name" class="text-xs font-bold text-slate-900">
+                Property Landlord
+              </h4>
+
+              <p class="text-[11px] font-semibold text-emerald-600 flex items-center gap-1 mt-0.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
+                Verified Host
+              </p>
+            </div>
+          </div>
+
+          <!-- INQUIRY / DIRECT MESSAGE FORM (Shown for Renters & Other Landlords) -->
+          <div id="renter-inquiry-container">
+            <form onsubmit="handleInquirySubmit(event)" class="space-y-3">
+              <div>
+                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                  Your Inquiry & Viewing Request
+                </label>
+
+                <textarea
+                  id="inquiry-message"
+                  rows="3"
+                  required
+                  class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-medium text-slate-800 focus-ring-terracotta transition resize-none"
+                  placeholder="Hi! I am interested in this room..."
+                >Hi! I am interested in this room and would like to schedule a viewing appointment.</textarea>
+              </div>
+
+              <button type="submit" id="submit-inquiry-btn" class="w-full bg-terracotta bg-terracotta-hover text-white text-xs font-bold tracking-wide py-3.5 rounded-2xl shadow-lg shadow-terracotta/20 transition-all duration-200 hover:scale-[1.01]">
+                Send Direct Message & Rental Specs
+              </button>
+            </form>
+          </div>
+
+          <!-- OWNER NOTICE & MANAGE BUTTON (Only shown to the exact Landlord who posted this) -->
+          <div id="landlord-notice-container" class="hidden bg-slate-50 border border-slate-200/80 rounded-2xl p-4 space-y-3">
+            <div class="flex items-center gap-2 text-xs font-bold text-slate-800">
+              <span class="w-2 h-2 rounded-full bg-terracotta inline-block"></span>
+              <span>Owner Management View</span>
+            </div>
+
+            <p class="text-xs text-slate-500">
+              You are currently previewing your listing as an active landlord.
+            </p>
+
+            <a href="landlord-dashboard.html" class="w-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold py-3 rounded-xl transition text-center block shadow-sm">
+              ✏️ Manage or Edit Listing
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <script>
+    const API_BASE_URL = 'http://localhost:5000/api';
+
+    let currentRoom = null;
+    let currentUser = null;
+    let galleryImages = [];
+    let mapInstance = null;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const storedUser = localStorage.getItem('user');
+
+      if (storedUser) {
+        currentUser = JSON.parse(storedUser);
+
+        // Dynamic Dashboard button target
+        const dashBtn = document.getElementById('header-dashboard-btn');
+        if (currentUser.role === 'landlord') {
+          dashBtn.href = 'landlord-dashboard.html';
+        } else if (currentUser.role === 'admin') {
+          dashBtn.href = 'admin-dashboard.html';
+        } else {
+          dashBtn.href = 'renter-dashboard.html';
+        }
+      }
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const roomId = urlParams.get('id');
+
+      if (roomId) {
+        fetchRoomDetail(roomId);
+      } else {
+        alert('No room specified.');
+        window.location.href = 'listings.html';
+      }
+    });
+
+    async function fetchRoomDetail(id) {
+      try {
+        const response = await fetch(`${API_BASE_URL}/listings/${id}`);
+
+        if (!response.ok) {
+          throw new Error('Listing not found');
+        }
+
+        const room = await response.json();
+        populateRoomData(room);
+        
+        // Fetch landlord profile who posted this property
+        if (room.landlord_id) {
+          fetchLandlordProfile(room.landlord_id);
+        }
+      } catch (err) {
+        console.error("Error loading room details:", err);
+        alert('Could not load room details from the server.');
+      }
+    }
+
+    async function fetchLandlordProfile(landlordId) {
+      try {
+        const res = await fetch(`${API_BASE_URL}/users/${landlordId}`);
+        if (res.ok) {
+          const landlord = await res.json();
+          const landlordName = landlord.full_name || landlord.name || 'Property Landlord';
+          
+          document.getElementById('landlord-name').innerText = landlordName;
+          
+          const avatarContainer = document.getElementById('landlord-avatar');
+          if (landlord.profile_image) {
+            avatarContainer.innerHTML = `<img src="${landlord.profile_image}" class="w-full h-full object-cover">`;
+          } else {
+            avatarContainer.innerHTML = `<span id="landlord-initial">${landlordName.charAt(0).toUpperCase()}</span>`;
+          }
+        }
+      } catch (e) {
+        console.error("Could not fetch landlord profile", e);
+      }
+    }
+
+    function populateRoomData(room) {
+      currentRoom = room;
+
+      document.title = `${room.title} - Roomie Rent`;
+
+      document.getElementById('breadcrumb-city').innerText =
+        room.city || 'Metro Manila';
+
+      document.getElementById('breadcrumb-title').innerText =
+        room.title;
+
+      document.getElementById('room-city-badge').innerText =
+        room.city || 'Metro Manila';
+
+      document.getElementById('room-title-heading').innerText =
+        room.title;
+
+      document.getElementById('room-description').innerText =
+        room.description || 'Verified property listing.';
+
+      document.getElementById('room-price-display').innerText =
+        `₱${Number(room.price).toLocaleString()}`;
+
+      // STRICT OWNERSHIP CHECK: Show Manage button ONLY if logged in as the exact Landlord owner
+      const isOwner = currentUser && Number(currentUser.id) === Number(room.landlord_id);
+
+      if (isOwner) {
+        document.getElementById('renter-inquiry-container').classList.add('hidden');
+        document.getElementById('landlord-notice-container').classList.remove('hidden');
+      } else {
+        document.getElementById('renter-inquiry-container').classList.remove('hidden');
+        document.getElementById('landlord-notice-container').classList.add('hidden');
+      }
+
+      // HANDLE ROOM STATUS (Available vs Rented / Unavailable)
+      const statusBadge = document.getElementById('room-status-badge');
+      const statusDot = document.getElementById('room-status-dot');
+      const statusText = document.getElementById('room-status-text');
+      const statusSubtitle = document.getElementById('room-status-subtitle');
+
+      if (room.status === 'rented' || room.status === 'unavailable') {
+        statusBadge.className = "px-3.5 py-1.5 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200/80 shadow-sm flex items-center gap-1.5";
+        statusDot.className = "w-2 h-2 rounded-full bg-rose-500 inline-block";
+        statusText.innerText = "Rented / Unavailable";
+        statusSubtitle.innerText = "This property has been rented out or is currently unavailable.";
+
+        if (!isOwner) {
+          const inquiryTextarea = document.getElementById('inquiry-message');
+          const submitBtn = document.getElementById('submit-inquiry-btn');
+          if (inquiryTextarea) {
+            inquiryTextarea.disabled = true;
+            inquiryTextarea.value = "This room is currently rented or unavailable for inquiries.";
+            inquiryTextarea.classList.add('bg-slate-100', 'cursor-not-allowed');
+          }
+          if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.className = "w-full bg-slate-300 text-slate-500 text-xs font-bold tracking-wide py-3.5 rounded-2xl cursor-not-allowed";
+            submitBtn.innerText = "Property Currently Rented";
+          }
+        }
+      } else {
+        statusBadge.className = "px-3.5 py-1.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80 shadow-sm flex items-center gap-1.5";
+        statusDot.className = "w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse";
+        statusText.innerText = "Available Now";
+        statusSubtitle.innerText = "Verified room listing available for move-in";
+      }
+
+      if (room.house_rules && room.house_rules.trim() !== '') {
+        document.getElementById('room-house-rules').innerText =
+          room.house_rules;
+      }
+
+      if (room.image_url) {
+        try {
+          const parsed = JSON.parse(room.image_url);
+
+          if (Array.isArray(parsed)) {
+            galleryImages = parsed;
+          } else {
+            galleryImages = [room.image_url];
+          }
+        } catch (e) {
+          galleryImages = [room.image_url];
+        }
+      }
+
+      if (galleryImages.length > 0) {
+        document.getElementById('main-image').src =
+          galleryImages[0];
+
+        if (galleryImages.length > 1) {
+          renderThumbnails(0);
+        }
+      }
+
+      initPropertyMap(room);
+    }
+
+    function initPropertyMap(room) {
+      const defaultLat = room.latitude
+        ? parseFloat(room.latitude)
+        : 14.5995;
+
+      const defaultLng = room.longitude
+        ? parseFloat(room.longitude)
+        : 120.9842;
+
+      const hasGPS =
+        room.latitude &&
+        room.longitude;
+
+      if (mapInstance) {
+        mapInstance.remove();
+      }
+
+      mapInstance = L.map('map-container').setView(
+        [defaultLat, defaultLng],
+        hasGPS ? 16 : 13
+      );
+
+      L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {
+          maxZoom: 19,
+          attribution:
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }
+      ).addTo(mapInstance);
+
+      if (hasGPS) {
+        L.marker([
+          defaultLat,
+          defaultLng
+        ])
+          .addTo(mapInstance)
+          .bindPopup(
+            `<b>${room.title}</b><br>₱${Number(room.price).toLocaleString()} /mo`
+          )
+          .openPopup();
+
+        document.getElementById('map-status-text').innerText =
+          `📍 Showing exact GPS pinned location (${defaultLat}, ${defaultLng})`;
+      } else {
+        document.getElementById('map-status-text').innerText =
+          `⚠️ Landlord has not pinned exact GPS coordinates yet. Showing general city area (${room.city || 'Metro Manila'}).`;
+      }
+    }
+
+    function renderThumbnails(activeIndex) {
+      const galleryContainer =
+        document.getElementById('gallery-thumbnails');
+
+      galleryContainer.classList.remove('hidden');
+
+      galleryContainer.innerHTML =
+        galleryImages.map((imgUrl, idx) => {
+          const isActive = idx === activeIndex;
+
+          return `
+            <button
+              onclick="setMainImage('${imgUrl}', ${idx})"
+              class="group/thumb relative w-20 h-20 rounded-2xl overflow-hidden border-2 shrink-0 transition-all duration-300 transform hover:scale-105 ${
+                isActive
+                  ? 'border-terracotta shadow-md shadow-terracotta/20 scale-105'
+                  : 'border-slate-200/80 hover:border-terracotta/60'
+              }"
+            >
+              <img
+                src="${imgUrl}"
+                class="w-full h-full object-cover transition-transform duration-300 group-hover/thumb:scale-110"
+              >
+            </button>
+          `;
+        })
+        .join('');
+    }
+
+    function setMainImage(url, activeIndex) {
+      const mainImg =
+        document.getElementById('main-image');
+
+      mainImg.style.opacity = '0.4';
+
+      setTimeout(() => {
+        mainImg.src = url;
+        mainImg.style.opacity = '1';
+      }, 150);
+
+      renderThumbnails(activeIndex);
+    }
+
+    function switchTab(tabId) {
+      document
+        .querySelectorAll('.tab-content')
+        .forEach(c => c.classList.add('hidden'));
+
+      document
+        .getElementById(tabId)
+        .classList.remove('hidden');
+
+      document
+        .querySelectorAll('.tab-btn')
+        .forEach(b => {
+          b.className =
+            "tab-btn text-slate-400 hover:text-slate-800 pb-3 transition duration-200";
+        });
+
+      const activeBtn =
+        document.getElementById('btn-' + tabId);
+
+      activeBtn.className =
+        "tab-btn text-terracotta border-b-2 border-terracotta pb-3 transition duration-200";
+
+      if (tabId === 'tab-details' && mapInstance) {
+        setTimeout(() => {
+          mapInstance.invalidateSize();
+        }, 200);
+      }
+    }
+
+    async function handleInquirySubmit(e) {
+      e.preventDefault();
+
+      if (!currentRoom) {
+        return alert('Room details not loaded.');
+      }
+
+      if (currentRoom.status === 'rented' || currentRoom.status === 'unavailable') {
+        return alert('This room is currently rented or unavailable.');
+      }
+
+      if (!currentUser || !currentUser.id) {
+        return alert('Please log in before sending a message.');
+      }
+
+      const messageText =
+        document.getElementById('inquiry-message').value.trim();
+
+      if (!messageText) {
+        return alert('Please enter a message.');
+      }
+
+      const mainImg =
+        galleryImages.length > 0
+          ? galleryImages[0]
+          : null;
+
+      const payload = {
+        listing_id: currentRoom.id,
+        landlord_id: currentRoom.landlord_id,
+        renter_id: currentUser.id,
+        renter_name:
+          currentUser.full_name ||
+          currentUser.name ||
+          'Prospective Tenant',
+        renter_email:
+          currentUser.email ||
+          'N/A',
+        renter_phone:
+          currentUser.phone_number ||
+          currentUser.phone ||
+          'N/A',
+        listing_title: currentRoom.title,
+        listing_price: currentRoom.price,
+        listing_city: currentRoom.city,
+        listing_image: mainImg,
+        message: messageText
+      };
+
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/inquiries`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+          }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            result.message ||
+            'Failed to send message'
+          );
+        }
+
+        alert(
+          'Your message and rental property specs have been sent directly to the landlord inbox!'
+        );
+
+        document.getElementById(
+          'inquiry-message'
+        ).value = '';
+
+      } catch (err) {
+        console.error(
+          "Inquiry error:",
+          err
+        );
+
+        alert(
+          'Error sending message: ' +
+          err.message
+        );
+      }
+    }
+  </script>
+</body>
+</html>

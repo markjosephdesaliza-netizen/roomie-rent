@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Renter Portal - Roomie Rent</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .font-serif-custom { font-family: 'Playfair Display', serif; }
+    .text-terracotta { color: #C85A32; }
+    .bg-terracotta { background-color: #C85A32; }
+    .bg-terracotta-hover:hover { background-color: #B24E2A; }
+    .border-terracotta { border-color: #C85A32; }
+    .focus-ring-terracotta:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(200, 90, 50, 0.25);
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col selection:bg-rose-100 selection:text-terracotta">
+
+  <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 md:px-10 py-3.5 flex items-center justify-between">
+    <div class="flex items-center space-x-6">
+      <a href="index.html" class="flex items-center space-x-2.5 group">
+        <div class="w-9 h-9 rounded-xl bg-terracotta flex items-center justify-center text-white shadow-md shadow-terracotta/20 group-hover:scale-105 transition-transform">
+          <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20">
+            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l1.293 1.293a1 1 0 001.414-1.414l-7-7z"/>
+          </svg>
+        </div>
+        <span class="font-bold text-lg tracking-tight text-slate-900">Roomie<span class="text-terracotta">Rent</span></span>
+      </a>
+
+      <a href="index.html" class="hidden sm:flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-terracotta bg-slate-100 hover:bg-orange-50 px-3 py-1.5 rounded-xl transition">
+        <svg class="w-3.5 h-3.5 stroke-2 stroke-current" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+        <span>Back to Home Page</span>
+      </a>
+    </div>
+
+    <div class="flex items-center space-x-4">
+      <button onclick="openProfileModal()" class="text-xs font-semibold text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl">
+        <span>⚙️ Edit Profile</span>
+      </button>
+
+      <div class="h-4 w-[1px] bg-slate-200"></div>
+
+      <div class="flex items-center space-x-3">
+        <div id="header-avatar-container" class="w-8 h-8 rounded-full bg-slate-900 text-white font-bold text-xs flex items-center justify-center overflow-hidden">
+          <span id="user-avatar-initial">U</span>
+        </div>
+        <span id="user-display-name" class="text-xs font-bold text-slate-800 hidden sm:inline">Loading...</span>
+        <button onclick="handleLogout()" class="text-xs font-semibold text-slate-400 hover:text-rose-600 transition">Log Out</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-200">
+      <div>
+        <div class="inline-flex items-center gap-1.5 bg-rose-50 text-terracotta text-xs font-bold px-2.5 py-1 rounded-md mb-2">
+          <span>👤</span> Renter Dashboard
+        </div>
+        <h1 id="welcome-heading" class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Welcome back</h1>
+        <p class="text-xs text-slate-500 font-medium mt-1">Manage your saved listings, landlord inquiries, and active rental agreements.</p>
+      </div>
+
+      <a href="listings.html" class="bg-terracotta bg-terracotta-hover text-white text-xs font-bold px-5 py-3 rounded-2xl shadow-lg shadow-terracotta/20 transition flex items-center justify-center gap-2 self-start md:self-auto">
+        <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+        <span>Explore New Rooms</span>
+      </a>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Saved Favorites</span>
+        <div class="flex items-baseline justify-between">
+          <span id="stat-favorites-count" class="text-2xl font-extrabold text-slate-900">0</span>
+          <span class="text-xs font-medium text-terracotta">Rooms saved</span>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm cursor-pointer hover:border-terracotta transition" onclick="switchTab('tab-inquiries')">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Active Inquiries</span>
+        <div class="flex items-baseline justify-between">
+          <span id="stat-inquiries-count" class="text-2xl font-extrabold text-slate-900">0</span>
+          <span class="text-xs font-medium text-indigo-600 underline">Landlords messaging</span>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Scheduled Viewings</span>
+        <div class="flex items-baseline justify-between">
+          <span class="text-2xl font-extrabold text-slate-900">0</span>
+          <span class="text-xs font-medium text-amber-600">None scheduled</span>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Current Lease</span>
+        <div class="flex items-baseline justify-between">
+          <span class="text-2xl font-extrabold text-slate-400">None</span>
+          <span class="text-xs font-medium text-slate-500">No active lease</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="border-b border-slate-200 mb-6">
+      <nav class="flex space-x-8 text-xs sm:text-sm font-bold overflow-x-auto">
+        <button onclick="switchTab('tab-favorites')" id="btn-tab-favorites" class="tab-btn text-terracotta border-b-2 border-terracotta pb-3 transition whitespace-nowrap">
+          Saved Rooms (<span id="tab-fav-count">0</span>)
+        </button>
+        <button onclick="switchTab('tab-inquiries')" id="btn-tab-inquiries" class="tab-btn text-slate-400 hover:text-slate-800 pb-3 transition whitespace-nowrap flex items-center gap-1.5">
+          <span>Inquiries & Messages</span> (<span id="tab-inq-count">0</span>)
+        </button>
+        <button onclick="switchTab('tab-lease')" id="btn-tab-lease" class="tab-btn text-slate-400 hover:text-slate-800 pb-3 transition whitespace-nowrap">
+          My Active Lease
+        </button>
+      </nav>
+    </div>
+
+    <div id="tab-favorites" class="tab-content space-y-6">
+      <div id="favorites-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </div>
+
+    <div id="tab-inquiries" class="tab-content hidden space-y-4">
+      <div id="inquiries-container" class="grid grid-cols-1 lg:grid-cols-12 bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm min-h-[500px]">
+        <div class="lg:col-span-5 border-r border-slate-200 p-4 space-y-2 overflow-y-auto max-h-[550px]" id="renter-threads-container">
+          <p class="text-xs text-slate-400 text-center py-10">Loading your landlord inquiries...</p>
+        </div>
+
+        <div class="lg:col-span-7 flex flex-col justify-between bg-slate-50/50 p-6" id="renter-active-chat-wrapper">
+          <div class="text-center py-24 text-slate-400 text-xs">
+            👈 Select an inquiry thread on the left to view attached property specs and chat with the landlord.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-lease" class="tab-content hidden space-y-6">
+      <div class="bg-white rounded-3xl border border-slate-200 p-8 text-center shadow-sm max-w-2xl mx-auto">
+        <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center mx-auto mb-3 font-bold">📄</div>
+        <h3 class="font-bold text-slate-900 text-base mb-1">No active lease agreement</h3>
+        <p class="text-slate-500 text-xs max-w-sm mx-auto mb-4">You currently do not have any active rental contracts signed through Roomie Rent.</p>
+        <a href="listings.html" class="inline-block bg-terracotta text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-sm hover:bg-terracotta-hover transition">Explore Available Rooms</a>
+      </div>
+    </div>
+  </main>
+
+  <!-- READ-ONLY LANDLORD PROFILE MODAL -->
+  <div id="view-user-info-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-slate-100 text-center relative transform scale-95 transition-transform duration-300">
+      <button onclick="closeUserInfoModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:text-slate-900 flex items-center justify-center transition">✕</button>
+      
+      <div id="info-modal-avatar-wrapper" class="w-20 h-20 rounded-full bg-slate-100 border-2 border-terracotta mx-auto mb-3 overflow-hidden shadow-sm flex items-center justify-center">
+        <img id="info-modal-avatar" src="" class="w-full h-full object-cover hidden">
+        <span id="info-modal-initial" class="text-2xl font-bold text-terracotta">L</span>
+      </div>
+
+      <span class="text-[10px] font-bold text-terracotta uppercase tracking-wider block mb-1">Landlord Profile Summary</span>
+      <h3 id="info-modal-name" class="font-bold text-slate-900 text-lg">Landlord Name</h3>
+      <p id="info-modal-role" class="text-xs text-slate-400 mb-4">Verified Property Manager</p>
+
+      <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4 text-left space-y-2.5 mb-4 text-xs">
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase block">Email Address</span>
+          <span id="info-modal-email" class="font-semibold text-slate-800">landlord@email.com</span>
+        </div>
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase block">Mobile Phone</span>
+          <span id="info-modal-phone" class="font-semibold text-terracotta">09123456789</span>
+        </div>
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase block">Location</span>
+          <span id="info-modal-city" class="font-semibold text-slate-800">Metro Manila</span>
+        </div>
+      </div>
+
+      <p class="text-[10px] text-slate-400">💡 Read-only summary for communication reference.</p>
+    </div>
+  </div>
+
+  <!-- EDIT PROFILE & PASSWORD MODAL -->
+  <div id="profile-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex justify-end opacity-0 pointer-events-none transition-opacity duration-300">
+    <div id="profile-panel" class="bg-white w-full max-w-md h-full p-6 shadow-2xl flex flex-col justify-between overflow-y-auto transform translate-x-full transition-transform duration-300">
+      <div>
+        <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
+          <div>
+            <span class="text-[10px] font-bold text-terracotta uppercase tracking-wider">Account Settings</span>
+            <h3 class="font-bold text-slate-900 text-lg">Edit Renter Profile</h3>
+          </div>
+          <button onclick="closeProfileModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:text-slate-900 flex items-center justify-center transition">✕</button>
+        </div>
+
+        <div class="flex flex-col items-center mb-6">
+          <div class="relative w-20 h-20 rounded-full overflow-hidden bg-slate-100 border-2 border-terracotta shadow-md mb-2 cursor-pointer group" onclick="document.getElementById('profile-img-input').click()">
+            <img id="profile-preview-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80" alt="Profile" class="w-full h-full object-cover group-hover:scale-105 transition">
+            <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition text-white text-[10px] font-bold">Change</div>
+          </div>
+          <input type="file" id="profile-img-input" accept="image/*" class="hidden" onchange="previewProfileImage(event)">
+          <span class="text-[11px] font-bold text-slate-600">Renter Avatar</span>
+        </div>
+
+        <form id="profile-form" onsubmit="saveProfileChanges(event)" class="space-y-4 mb-8">
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Full Legal Name</label>
+            <input type="text" id="prof-name" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus-ring-terracotta transition">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Email Address (Read-Only)</label>
+            <input type="email" id="prof-email" disabled class="w-full bg-slate-100 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-400 cursor-not-allowed">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Mobile Number</label>
+            <input type="text" id="prof-phone" placeholder="09123456789" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus-ring-terracotta transition">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">City</label>
+              <input type="text" id="prof-city" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus-ring-terracotta transition">
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Barangay</label>
+              <input type="text" id="prof-barangay" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus-ring-terracotta transition">
+            </div>
+          </div>
+          <button type="submit" class="w-full bg-terracotta bg-terracotta-hover text-white font-semibold py-3 rounded-xl shadow-lg transition-all text-xs">
+            Save Profile Changes
+          </button>
+        </form>
+
+        <hr class="border-slate-100 mb-6">
+
+        <form id="password-form" onsubmit="changePassword(event)" class="space-y-4">
+          <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Change Password</h4>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Current Password</label>
+            <input type="password" id="current-password" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus-ring-terracotta transition">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">New Password</label>
+            <input type="password" id="new-password" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus-ring-terracotta transition">
+          </div>
+          <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 rounded-xl shadow-sm transition-all text-xs">
+            Update Password
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-slate-950 text-slate-400 text-xs py-8 px-6 md:px-12 border-t border-slate-800 mt-12">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center space-x-2">
+        <div class="w-6 h-6 rounded-lg bg-terracotta flex items-center justify-center text-white font-bold text-xs">R</div>
+        <span class="font-bold text-sm text-white">RoomieRent</span>
+      </div>
+      <p>&copy; 2026 Roomie Rent Philippines. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    const API_BASE_URL = 'http://localhost:5000/api';
+    let currentUser = null;
+    let renterThreads = [];
+    let activeInquiryId = null;
+    let newProfileImageBase64 = null;
+
+    const userProfileCache = {};
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const storedUser = localStorage.getItem('user');
+      if (!storedUser) {
+        alert('Please log in to access your renter dashboard.');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      currentUser = JSON.parse(storedUser);
+      fetchUserProfileData();
+      loadFavorites();
+      fetchRenterInquiries();
+    });
+
+    async function fetchUserProfileData() {
+      try {
+        const res = await fetch(`${API_BASE_URL}/users/${currentUser.id}`);
+        if (res.ok) {
+          currentUser = await res.json();
+          currentUser.name = currentUser.full_name;
+          currentUser.phone = currentUser.phone_number;
+          localStorage.setItem('user', JSON.stringify(currentUser));
+        }
+      } catch (e) {}
+
+      const userName = currentUser.full_name || currentUser.name || 'Renter';
+      document.getElementById('user-display-name').innerText = userName;
+      document.getElementById('welcome-heading').innerText = `Welcome back, ${userName}`;
+
+      const avatarContainer = document.getElementById('header-avatar-container');
+      if (currentUser.profile_image) {
+        avatarContainer.innerHTML = `<img src="${currentUser.profile_image}" class="w-full h-full object-cover">`;
+      } else {
+        avatarContainer.innerHTML = `<span id="user-avatar-initial">${userName.charAt(0).toUpperCase()}</span>`;
+      }
+    }
+
+    async function getUserProfileById(userId) {
+      if (!userId) return null;
+      if (userProfileCache[userId]) return userProfileCache[userId];
+      try {
+        const res = await fetch(`${API_BASE_URL}/users/${userId}`);
+        if (res.ok) {
+          const userObj = await res.json();
+          userProfileCache[userId] = userObj;
+          return userObj;
+        }
+      } catch(e) {}
+      return null;
+    }
+
+    function handleLogout() {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      window.location.href = 'login.html';
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+      document.getElementById(tabId).classList.remove('hidden');
+
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        b.className = "tab-btn text-slate-400 hover:text-slate-800 pb-3 transition whitespace-nowrap";
+      });
+
+      const activeBtn = document.getElementById('btn-' + tabId);
+      if (activeBtn) {
+        activeBtn.className = "tab-btn text-terracotta border-b-2 border-terracotta pb-3 transition whitespace-nowrap";
+      }
+    }
+
+    function parseImage(rawImg) {
+      const fallback = 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80';
+      if (!rawImg) return fallback;
+      try {
+        const parsed = JSON.parse(rawImg);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed[0];
+      } catch (e) {}
+      return rawImg;
+    }
+
+    function openUserInfoModal(name, email, phone, city, profileImg) {
+      document.getElementById('info-modal-name').innerText = name || 'Landlord User';
+      document.getElementById('info-modal-email').innerText = email || 'No email provided';
+      document.getElementById('info-modal-phone').innerText = phone || 'No phone provided';
+      document.getElementById('info-modal-city').innerText = city || 'Metro Manila';
+
+      const avatarImg = document.getElementById('info-modal-avatar');
+      const initialSpan = document.getElementById('info-modal-initial');
+
+      if (profileImg && profileImg !== 'null' && profileImg !== 'undefined') {
+        avatarImg.src = profileImg;
+        avatarImg.classList.remove('hidden');
+        initialSpan.classList.add('hidden');
+      } else {
+        avatarImg.classList.add('hidden');
+        initialSpan.classList.remove('hidden');
+        initialSpan.innerText = name ? name.charAt(0).toUpperCase() : 'L';
+      }
+
+      const modal = document.getElementById('view-user-info-modal');
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+    }
+
+    function closeUserInfoModal() {
+      const modal = document.getElementById('view-user-info-modal');
+      modal.classList.add('opacity-0', 'pointer-events-none');
+    }
+
+    function openProfileModal() {
+      document.getElementById('prof-name').value = currentUser.full_name || currentUser.name || '';
+      document.getElementById('prof-email').value = currentUser.email || '';
+      document.getElementById('prof-phone').value = currentUser.phone_number || currentUser.phone || '';
+      document.getElementById('prof-city').value = currentUser.city || '';
+      document.getElementById('prof-barangay').value = currentUser.barangay || '';
+
+      const previewImg = document.getElementById('profile-preview-img');
+      previewImg.src = currentUser.profile_image || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80';
+
+      document.getElementById('profile-modal').classList.remove('opacity-0', 'pointer-events-none');
+      document.getElementById('profile-panel').classList.remove('translate-x-full');
+    }
+
+    function closeProfileModal() {
+      document.getElementById('profile-panel').classList.add('translate-x-full');
+      document.getElementById('profile-modal').classList.add('opacity-0', 'pointer-events-none');
+      newProfileImageBase64 = null;
+    }
+
+    function previewProfileImage(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        newProfileImageBase64 = e.target.result;
+        document.getElementById('profile-preview-img').src = newProfileImageBase64;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function saveProfileChanges(e) {
+      e.preventDefault();
+      const payload = {
+        full_name: document.getElementById('prof-name').value,
+        phone_number: document.getElementById('prof-phone').value,
+        city: document.getElementById('prof-city').value,
+        barangay: document.getElementById('prof-barangay').value,
+        profile_image: newProfileImageBase64 || currentUser.profile_image || null
+      };
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/users/${currentUser.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) throw new Error('Failed to update profile');
+        const data = await res.json();
+        currentUser = data.user;
+        currentUser.name = data.user.full_name;
+        currentUser.phone = data.user.phone_number;
+        localStorage.setItem('user', JSON.stringify(currentUser));
+
+        alert('Profile updated successfully!');
+        closeProfileModal();
+        fetchUserProfileData();
+      } catch (err) {
+        alert('Error updating profile: ' + err.message);
+      }
+    }
+
+    async function changePassword(e) {
+      e.preventDefault();
+      const current_password = document.getElementById('current-password').value;
+      const new_password = document.getElementById('new-password').value;
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/users/${currentUser.id}/password`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ current_password, new_password })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Failed to change password');
+
+        alert('Password changed successfully!');
+        document.getElementById('password-form').reset();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    function loadFavorites() {
+      const container = document.getElementById('favorites-container');
+      const storageKey = `saved_rooms_${currentUser.id}`; // FIXED: User-specific storage key
+      let favorites = JSON.parse(localStorage.getItem(storageKey)) || [];
+
+      document.getElementById('stat-favorites-count').innerText = favorites.length;
+      document.getElementById('tab-fav-count').innerText = favorites.length;
+
+      if (favorites.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full bg-white border border-slate-200 rounded-3xl p-12 text-center shadow-sm">
+            <div class="w-12 h-12 rounded-full bg-orange-50 text-terracotta flex items-center justify-center mx-auto mb-3 font-bold text-lg">🏠</div>
+            <h3 class="font-bold text-slate-900 text-base mb-1">No saved favorite rooms yet</h3>
+            <p class="text-slate-500 text-xs max-w-sm mx-auto mb-4">Explore our listings and click the bookmark icon on rooms you want to save for later.</p>
+            <a href="listings.html" class="inline-block bg-terracotta text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-sm hover:bg-terracotta-hover transition">Explore Listings</a>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = favorites.map((room, index) => {
+        const mainImg = parseImage(room.image_url);
+        return `
+          <div class="group bg-white rounded-2xl border border-slate-200/90 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+            <div>
+              <div class="relative h-48 overflow-hidden bg-slate-100">
+                <img src="${mainImg}" alt="${room.title}" class="w-full h-full object-cover">
+                <button onclick="removeFavorite(${index})" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-rose-500 hover:bg-rose-50 transition shadow-sm" title="Remove">✕</button>
+              </div>
+              <div class="p-5">
+                <div class="text-[11px] font-bold text-terracotta uppercase tracking-wider mb-1">${room.city || 'Metro Manila'}</div>
+                <h3 class="font-bold text-slate-900 text-base mb-1">${room.title}</h3>
+              </div>
+            </div>
+            <div class="p-5 pt-0">
+              <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+                <div>
+                  <span class="text-terracotta text-2xl font-extrabold tracking-tight">₱${Number(room.price).toLocaleString()}</span>
+                  <span class="text-xs font-normal text-slate-400">/mo</span>
+                </div>
+                <a href="room-detail.html?id=${room.id}" class="bg-slate-900 hover:bg-terracotta text-white text-xs font-semibold px-3.5 py-2 rounded-xl transition-all">View Details</a>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function removeFavorite(index) {
+      const storageKey = `saved_rooms_${currentUser.id}`; // FIXED: User-specific storage key
+      let favorites = JSON.parse(localStorage.getItem(storageKey)) || [];
+      favorites.splice(index, 1);
+      localStorage.setItem(storageKey, JSON.stringify(favorites));
+      loadFavorites();
+    }
+
+    async function fetchRenterInquiries() {
+      const container = document.getElementById('renter-threads-container');
+      if (!currentUser || !currentUser.id) {
+        renterThreads = [];
+        document.getElementById('stat-inquiries-count').innerText = '0';
+        document.getElementById('tab-inq-count').innerText = '0';
+        container.innerHTML = `<div class="py-16 text-center"><p class="text-xs text-slate-400">Unable to identify the logged-in renter.</p></div>`;
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/inquiries/renter/${currentUser.id}`);
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.message || 'Failed to fetch renter inquiries');
+        }
+
+        const data = await res.json();
+        renterThreads = Array.isArray(data) ? data : [];
+
+        document.getElementById('stat-inquiries-count').innerText = renterThreads.length;
+        document.getElementById('tab-inq-count').innerText = renterThreads.length;
+
+        if (renterThreads.length === 0) {
+          activeInquiryId = null;
+          document.getElementById('renter-active-chat-wrapper').innerHTML = `
+            <div class="text-center py-24 text-slate-400 text-xs">
+              👈 Select an inquiry thread on the left to view attached property specs and chat with the landlord.
+            </div>
+          `;
+
+          container.innerHTML = `
+            <div class="py-16 text-center">
+              <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-2 font-bold">💬</div>
+              <p class="text-xs font-bold text-slate-700">No active landlord inquiries yet</p>
+              <p class="text-[10px] text-slate-400 mt-1">Visit room listings to send a message to landlords.</p>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = renterThreads.map(t => {
+          const mainImg = parseImage(t.listing_image);
+          const isSelected = Number(t.id) === Number(activeInquiryId);
+
+          return `
+            <div onclick="selectRenterThread(${t.id})" class="p-3.5 rounded-2xl border transition cursor-pointer flex items-center gap-3 ${
+              isSelected ? 'bg-orange-50 border-terracotta shadow-sm' : 'bg-white border-slate-200 hover:border-slate-300'
+            }">
+              <img src="${mainImg}" class="w-12 h-12 rounded-xl object-cover shrink-0">
+              <div class="flex-1 overflow-hidden">
+                <div class="flex items-center justify-between">
+                  <h4 class="font-bold text-xs text-slate-900 truncate">${t.landlord_name || 'Landlord'}</h4>
+                  <span class="text-[9px] font-semibold text-slate-400">${new Date(t.last_updated || t.created_at || Date.now()).toLocaleDateString()}</span>
+                </div>
+                <p class="text-[11px] font-bold text-terracotta truncate">${t.listing_title || 'Rental Unit'}</p>
+                <p class="text-[10px] text-slate-500 truncate mt-0.5">${t.last_message || t.message || 'Inquiry sent'}</p>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        if (!activeInquiryId || !renterThreads.some(t => Number(t.id) === Number(activeInquiryId))) {
+          selectRenterThread(renterThreads[0].id);
+        }
+
+      } catch (err) {
+        console.error("Inquiries error:", err);
+        renterThreads = [];
+        document.getElementById('stat-inquiries-count').innerText = '0';
+        document.getElementById('tab-inq-count').innerText = '0';
+        container.innerHTML = `<div class="py-16 text-center"><p class="text-xs font-bold text-rose-600">Could not load your inquiries.</p><p class="text-[10px] text-slate-400 mt-1">${err.message}</p></div>`;
+      }
+    }
+
+    async function selectRenterThread(inquiryId) {
+      activeInquiryId = inquiryId;
+
+      const thread = renterThreads.find(t => Number(t.id) === Number(inquiryId));
+      if (!thread) return;
+
+      if (thread.landlord_id) {
+        const landlordProfile = await getUserProfileById(thread.landlord_id);
+        if (landlordProfile) {
+          thread.landlord_avatar = landlordProfile.profile_image || thread.landlord_avatar;
+          thread.landlord_email = landlordProfile.email || thread.landlord_email;
+          thread.landlord_phone = landlordProfile.phone_number || thread.landlord_phone;
+          thread.landlord_city = landlordProfile.city || thread.landlord_city;
+        }
+      }
+
+      const chatWrapper = document.getElementById('renter-active-chat-wrapper');
+      const mainImg = parseImage(thread.listing_image);
+
+      chatWrapper.innerHTML = `
+        <div class="bg-white border border-slate-200 rounded-2xl p-4 mb-4 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <img src="${mainImg}" class="w-14 h-14 rounded-xl object-cover border shrink-0">
+            <div>
+              <span class="text-[9px] font-bold text-terracotta uppercase tracking-wider">${thread.listing_city || 'Metro Manila'}</span>
+              <h3 class="font-bold text-xs sm:text-sm text-slate-900">${thread.listing_title || 'Property Unit'}</h3>
+              <p class="text-xs font-extrabold text-terracotta">₱${Number(thread.listing_price || 0).toLocaleString()} /mo</p>
+            </div>
+          </div>
+          
+          <div class="text-left sm:text-right border-t sm:border-t-0 pt-2 sm:pt-0 w-full sm:w-auto flex flex-col items-start sm:items-end gap-1">
+            <span class="text-[10px] font-bold text-slate-400 uppercase block">Landlord Information</span>
+            <p class="text-xs font-bold text-slate-800">${thread.landlord_name || 'Property Manager'}</p>
+            <p class="text-[10px] text-slate-500">${thread.landlord_email || 'No email provided'}</p>
+            ${thread.landlord_phone ? `<p class="text-[10px] font-medium text-terracotta">📞 ${thread.landlord_phone}</p>` : ''}
+
+            <button onclick="openUserInfoModal('${(thread.landlord_name || '').replace(/'/g, "\\'")}', '${(thread.landlord_email || '').replace(/'/g, "\\'")}', '${(thread.landlord_phone || '').replace(/'/g, "\\'")}', '${(thread.landlord_city || thread.listing_city || 'Metro Manila').replace(/'/g, "\\'")}', '${thread.landlord_avatar || ''}')" class="mt-1 text-[10px] font-bold text-terracotta hover:underline bg-orange-50 hover:bg-orange-100 px-2.5 py-1 rounded-md transition">
+              👁️ View Profile Info
+            </button>
+          </div>
+        </div>
+
+        <div id="renter-messages-history" class="flex-1 bg-white border border-slate-200 rounded-2xl p-4 overflow-y-auto max-h-[260px] space-y-3 mb-4">
+          <p class="text-xs text-slate-400 text-center">Loading conversation...</p>
+        </div>
+
+        <form onsubmit="sendRenterReply(event)" class="flex gap-2">
+          <input type="text" id="renter-chat-input" required placeholder="Type your reply to ${thread.landlord_name || 'landlord'}..." class="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs focus-ring-terracotta outline-none">
+          <button type="submit" class="bg-terracotta hover:bg-terracotta-hover text-white font-bold text-xs px-5 py-3 rounded-xl transition">Send Reply</button>
+        </form>
+      `;
+
+      loadRenterThreadMessages(inquiryId, thread);
+    }
+
+    async function loadRenterThreadMessages(inquiryId, thread) {
+      const container = document.getElementById('renter-messages-history');
+      try {
+        const res = await fetch(`${API_BASE_URL}/inquiries/${inquiryId}/messages`);
+        
+        if (!res.ok) {
+          const singleThread = renterThreads.find(t => Number(t.id) === Number(inquiryId));
+          if (singleThread && (singleThread.message || singleThread.last_message)) {
+            container.innerHTML = `
+              <div class="flex items-end gap-2 flex-row-reverse mb-2">
+                <div class="w-7 h-7 rounded-full bg-slate-200 border border-slate-300 overflow-hidden shrink-0 flex items-center justify-center text-[10px] font-bold text-slate-600">
+                  ${currentUser.profile_image ? `<img src="${currentUser.profile_image}" class="w-full h-full object-cover">` : `<span>${(currentUser.full_name || 'U').charAt(0).toUpperCase()}</span>`}
+                </div>
+                <div class="flex flex-col items-end max-w-[75%]">
+                  <span class="text-[9px] font-bold text-slate-400 mb-0.5">You (renter)</span>
+                  <div class="bg-terracotta text-white rounded-2xl rounded-tr-none p-3 text-xs shadow-sm">
+                    ${singleThread.message || singleThread.last_message}
+                  </div>
+                </div>
+              </div>
+            `;
+            return;
+          }
+          throw new Error('Failed to load messages');
+        }
+
+        const messages = await res.json();
+        if (!messages || messages.length === 0) {
+          container.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">No previous chat messages.</p>`;
+          return;
+        }
+
+        container.innerHTML = messages.map(m => {
+          const isRenter = m.sender_role === 'renter';
+          const avatarUrl = isRenter ? (currentUser.profile_image || null) : (thread.landlord_avatar || null);
+          const initial = (m.sender_name || 'U').charAt(0).toUpperCase();
+
+          return `
+            <div class="flex items-end gap-2 ${isRenter ? 'flex-row-reverse' : 'flex-row'} mb-2">
+              <div class="w-7 h-7 rounded-full bg-slate-200 border border-slate-300 overflow-hidden shrink-0 flex items-center justify-center text-[10px] font-bold text-slate-600">
+                ${avatarUrl ? `<img src="${avatarUrl}" class="w-full h-full object-cover">` : `<span>${initial}</span>`}
+              </div>
+
+              <div class="flex flex-col ${isRenter ? 'items-end' : 'items-start'} max-w-[75%]">
+                <span class="text-[9px] font-bold text-slate-400 mb-0.5">${m.sender_name || (isRenter ? 'You' : 'Landlord')} (${m.sender_role})</span>
+                <div class="rounded-2xl p-3 text-xs ${
+                  isRenter ? 'bg-terracotta text-white rounded-tr-none' : 'bg-slate-100 text-slate-800 rounded-tl-none'
+                }">
+                  ${m.message_text}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        container.scrollTop = container.scrollHeight;
+      } catch (err) {
+        container.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">Conversation history starting now...</p>`;
+      }
+    }
+
+    async function sendRenterReply(e) {
+      e.preventDefault();
+      if (!activeInquiryId) return;
+
+      const input = document.getElementById('renter-chat-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/inquiries/${activeInquiryId}/messages`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sender_role: 'renter',
+            sender_name: currentUser.full_name || currentUser.name || 'Renter',
+            message_text: text
+          })
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || 'Failed to send reply');
+
+        input.value = '';
+        const thread = renterThreads.find(t => Number(t.id) === Number(activeInquiryId));
+        await loadRenterThreadMessages(activeInquiryId, thread);
+        await fetchRenterInquiries();
+      } catch (err) {
+        alert('Error sending message: ' + err.message);
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Landlord Portal - Roomie Rent</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet">
+
+  <!-- Leaflet Map CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .font-serif-custom { font-family: 'Playfair Display', serif; }
+    .text-terracotta { color: #C85A32; }
+    .bg-terracotta { background-color: #C85A32; }
+    .bg-terracotta-hover:hover { background-color: #B24E2A; }
+    .border-terracotta { border-color: #C85A32; }
+    .focus-ring-terracotta:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(200, 90, 50, 0.25);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col selection:bg-rose-100 selection:text-terracotta">
+
+  <!-- TOP NAVIGATION HEADER -->
+  <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 md:px-10 py-3.5 flex items-center justify-between">
+    <div class="flex items-center space-x-6">
+      <a href="index.html" class="flex items-center space-x-2.5 group">
+        <div class="w-9 h-9 rounded-xl bg-terracotta flex items-center justify-center text-white shadow-md shadow-terracotta/20 group-hover:scale-105 transition-transform">
+          <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20">
+            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l1.293 1.293a1 1 0 001.414-1.414l-7-7z"/>
+          </svg>
+        </div>
+        <span class="font-bold text-lg tracking-tight text-slate-900">Roomie<span class="text-terracotta">Rent</span></span>
+      </a>
+
+      <a href="index.html" class="hidden sm:flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-terracotta bg-slate-100 hover:bg-orange-50 px-3 py-1.5 rounded-xl transition">
+        <svg class="w-3.5 h-3.5 stroke-2 stroke-current" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+        <span>Back to Home Page</span>
+      </a>
+    </div>
+
+    <div class="flex items-center space-x-4">
+      <button onclick="openProfileModal()" class="text-xs font-semibold text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl">
+        <span>⚙️ Edit Profile</span>
+      </button>
+
+      <div class="h-4 w-[1px] bg-slate-200"></div>
+
+      <div class="flex items-center space-x-3">
+        <div id="header-avatar-container" class="w-8 h-8 rounded-full bg-terracotta text-white font-bold text-xs flex items-center justify-center overflow-hidden">
+          <span id="user-avatar-initial">L</span>
+        </div>
+        <span id="user-display-name" class="text-xs font-bold text-slate-800 hidden sm:inline">Loading...</span>
+        <button onclick="handleLogout()" class="text-xs font-semibold text-slate-400 hover:text-rose-600 transition">Log Out</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-200">
+      <div>
+        <div class="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-md mb-2">
+          <span>🏢</span> Verified Property Manager
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Landlord Control Center & Inbox</h1>
+        <p class="text-xs text-slate-500 font-medium mt-1">Manage listings, edit room info, and communicate directly with interested renters.</p>
+      </div>
+
+      <button onclick="openAddModal()" class="bg-terracotta bg-terracotta-hover text-white text-xs font-bold px-5 py-3 rounded-2xl shadow-lg shadow-terracotta/20 transition flex items-center justify-center gap-2 self-start md:self-auto">
+        <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+        <span>Post New Room Listing</span>
+      </button>
+    </div>
+
+    <!-- STATS OVERVIEW CARDS -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Monthly Revenue</span>
+        <div class="flex items-baseline justify-between">
+          <span class="text-2xl font-extrabold text-slate-900">₱0</span>
+          <span class="text-xs font-semibold text-emerald-600">New System</span>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Total Properties</span>
+        <div class="flex items-baseline justify-between">
+          <span id="stat-total-props" class="text-2xl font-extrabold text-slate-900">0</span>
+          <span class="text-xs font-medium text-terracotta">Active listings</span>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm cursor-pointer hover:border-terracotta transition" onclick="toggleInquiriesSection()">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Message Inbox 💬</span>
+        <div class="flex items-baseline justify-between">
+          <span id="stat-pending-inquiries" class="text-2xl font-extrabold text-slate-900">0</span>
+          <span class="text-xs font-medium text-amber-600 underline">Open Inbox</span>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Occupancy Rate</span>
+        <div class="flex items-baseline justify-between">
+          <span class="text-2xl font-extrabold text-indigo-600">100%</span>
+          <span class="text-xs font-medium text-slate-500">Fresh start</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- THREADED MESSAGE INBOX SECTION -->
+    <div id="inquiries-section" class="mb-10 bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden hidden">
+      <div class="bg-slate-900 text-white p-4 px-6 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span>💬</span>
+          <h2 class="font-bold text-sm tracking-wide">Renter Communications & Rental Property Inbox</h2>
+        </div>
+        <button onclick="toggleInquiriesSection()" class="text-xs font-bold text-slate-400 hover:text-white">Close ✕</button>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 min-h-[480px]">
+        <!-- LEFT: CONVERSATION LIST -->
+        <div class="lg:col-span-5 border-r border-slate-200 p-4 space-y-2 overflow-y-auto max-h-[520px]" id="threads-container">
+          <p class="text-xs text-slate-400 text-center py-10">Loading inbox conversations...</p>
+        </div>
+
+        <!-- RIGHT: ACTIVE CHAT THREAD WITH RENTER INFO & AVATARS -->
+        <div class="lg:col-span-7 flex flex-col justify-between bg-slate-50/50 p-6" id="active-chat-wrapper">
+          <div class="text-center py-20 text-slate-400 text-xs">
+            👈 Select a renter thread on the left to view attached rental specs, renter info, and continue the conversation.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- POSTED PROPERTIES SECTION -->
+    <div class="space-y-10">
+      <div>
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-bold text-lg text-slate-900 tracking-tight">Your Posted Properties</h2>
+        </div>
+
+        <div id="landlord-listings-container" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- READ-ONLY USER PROFILE MODAL -->
+  <div id="view-user-info-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-slate-100 text-center relative transform scale-95 transition-transform duration-300">
+      <button onclick="closeUserInfoModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:text-slate-900 flex items-center justify-center transition">✕</button>
+      
+      <div id="info-modal-avatar-wrapper" class="w-20 h-20 rounded-full bg-slate-100 border-2 border-terracotta mx-auto mb-3 overflow-hidden shadow-sm flex items-center justify-center">
+        <img id="info-modal-avatar" src="" class="w-full h-full object-cover hidden">
+        <span id="info-modal-initial" class="text-2xl font-bold text-terracotta">U</span>
+      </div>
+
+      <span class="text-[10px] font-bold text-terracotta uppercase tracking-wider block mb-1">Renter Profile Summary</span>
+      <h3 id="info-modal-name" class="font-bold text-slate-900 text-lg">Renter Name</h3>
+      <p id="info-modal-role" class="text-xs text-slate-400 mb-4">Prospective Tenant</p>
+
+      <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4 text-left space-y-2.5 mb-4 text-xs">
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase block">Email Address</span>
+          <span id="info-modal-email" class="font-semibold text-slate-800">renter@email.com</span>
+        </div>
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase block">Mobile Phone</span>
+          <span id="info-modal-phone" class="font-semibold text-terracotta">09123456789</span>
+        </div>
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase block">Location</span>
+          <span id="info-modal-city" class="font-semibold text-slate-800">Pasig City</span>
+        </div>
+      </div>
+
+      <p class="text-[10px] text-slate-400">💡 Read-only summary for communication reference.</p>
+    </div>
+  </div>
+
+  <!-- EDIT PROFILE & PASSWORD MODAL -->
+  <div id="profile-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex justify-end opacity-0 pointer-events-none transition-opacity duration-300">
+    <div id="profile-panel" class="bg-white w-full max-w-md h-full p-6 shadow-2xl flex flex-col justify-between overflow-y-auto transform translate-x-full transition-transform duration-300">
+      <div>
+        <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
+          <div>
+            <span class="text-[10px] font-bold text-terracotta uppercase tracking-wider">Account Settings</span>
+            <h3 class="font-bold text-slate-900 text-lg">Edit Landlord Profile</h3>
+          </div>
+          <button onclick="closeProfileModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:text-slate-900 flex items-center justify-center transition">✕</button>
+        </div>
+
+        <div class="flex flex-col items-center mb-6">
+          <div class="relative w-20 h-20 rounded-full overflow-hidden bg-slate-100 border-2 border-terracotta shadow-md mb-2 cursor-pointer group" onclick="document.getElementById('profile-img-input').click()">
+            <img id="profile-preview-img" src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80" alt="Profile" class="w-full h-full object-cover group-hover:scale-105 transition">
+            <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition text-white text-[10px] font-bold">Change</div>
+          </div>
+          <input type="file" id="profile-img-input" accept="image/*" class="hidden" onchange="previewProfileImage(event)">
+          <span class="text-[11px] font-bold text-slate-600">Landlord Avatar</span>
+        </div>
+
+        <form id="profile-form" onsubmit="saveProfileChanges(event)" class="space-y-4 mb-8">
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Full Name</label>
+            <input type="text" id="prof-name" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus-ring-terracotta transition">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Email Address (Read-Only)</label>
+            <input type="email" id="prof-email" disabled class="w-full bg-slate-100 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-400 cursor-not-allowed">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Phone Number</label>
+            <input type="text" id="prof-phone" placeholder="09123456789" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus-ring-terracotta transition">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">City</label>
+              <input type="text" id="prof-city" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus-ring-terracotta transition">
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Barangay</label>
+              <input type="text" id="prof-barangay" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus-ring-terracotta transition">
+            </div>
+          </div>
+          <button type="submit" class="w-full bg-terracotta bg-terracotta-hover text-white font-semibold py-3 rounded-xl shadow-lg transition-all text-xs">
+            Save Profile Changes
+          </button>
+        </form>
+
+        <hr class="border-slate-100 mb-6">
+
+        <form id="password-form" onsubmit="changePassword(event)" class="space-y-4">
+          <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Change Password</h4>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Current Password</label>
+            <input type="password" id="current-password" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus-ring-terracotta transition">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">New Password</label>
+            <input type="password" id="new-password" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus-ring-terracotta transition">
+          </div>
+          <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 rounded-xl shadow-sm transition-all text-xs">
+            Update Password
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD / EDIT PROPERTY MODAL -->
+  <div id="add-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex justify-end opacity-0 pointer-events-none transition-opacity duration-300">
+    <div id="add-panel" class="bg-white w-full max-w-lg h-full p-6 shadow-2xl flex flex-col justify-between overflow-y-auto transform translate-x-full transition-transform duration-300">
+      
+      <div>
+        <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
+          <div>
+            <span class="text-[10px] font-bold text-terracotta uppercase tracking-wider">Property Management</span>
+            <h3 id="modal-title-heading" class="font-bold text-slate-900 text-lg">Post a New Room Listing</h3>
+          </div>
+          <button onclick="closeAddModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:text-slate-900 flex items-center justify-center transition">✕</button>
+        </div>
+
+        <form id="add-listing-form" onsubmit="saveNewListing(event)" class="space-y-4">
+          <input type="hidden" id="edit-listing-id" value="">
+
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Property Title</label>
+            <input type="text" id="prop-title" required placeholder="e.g. Spacious Private Room near Ortigas CBD" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus-ring-terracotta transition">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">City Location</label>
+              <select id="prop-city" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-slate-700 focus-ring-terracotta transition">
+                <option value="">Select City / Municipality</option>
+                <option value="Caloocan City">Caloocan City</option>
+                <option value="Las Piñas City">Las Piñas City</option>
+                <option value="Makati City">Makati City</option>
+                <option value="Malabon City">Malabon City</option>
+                <option value="Mandaluyong City">Mandaluyong City</option>
+                <option value="Manila">Manila</option>
+                <option value="Marikina City">Marikina City</option>
+                <option value="Muntinlupa City">Muntinlupa City</option>
+                <option value="Navotas City">Navotas City</option>
+                <option value="Parañaque City">Parañaque City</option>
+                <option value="Pasay City">Pasay City</option>
+                <option value="Pasig City">Pasig City</option>
+                <option value="Pateros">Pateros</option>
+                <option value="Quezon City">Quezon City</option>
+                <option value="San Juan City">San Juan City</option>
+                <option value="Taguig / BGC">Taguig / BGC</option>
+                <option value="Valenzuela City">Valenzuela City</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Monthly Rent (₱)</label>
+              <input type="number" id="prop-price" required placeholder="5500" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus-ring-terracotta transition">
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Property Pin Location</label>
+              <button type="button" onclick="getCurrentGPSLocation()" class="text-[10px] font-bold text-terracotta hover:underline flex items-center gap-1">
+                📍 Use Current Location
+              </button>
+            </div>
+
+            <div class="flex gap-1.5 mb-2">
+              <input type="text" id="map-search-input" placeholder="Search address, landmark, or street..." class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs text-slate-800 focus-ring-terracotta outline-none" onkeydown="if(event.key==='Enter'){event.preventDefault(); searchLocationOnMap();}">
+              <button type="button" onclick="searchLocationOnMap()" class="bg-slate-900 hover:bg-slate-800 text-white font-bold text-[11px] px-3 py-1.5 rounded-xl transition">
+                Search
+              </button>
+            </div>
+            
+            <div id="modal-map-picker" class="w-full h-48 rounded-xl border border-slate-200 shadow-inner overflow-hidden z-10 mb-1"></div>
+            <p class="text-[10px] text-slate-400">💡 Click anywhere on the map or drag the pin to set the exact rental location.</p>
+
+            <input type="hidden" id="prop-lat">
+            <input type="hidden" id="prop-lng">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Property Type</label>
+              <select id="prop-type" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-slate-700 focus-ring-terracotta transition">
+                <option value="">Select Property Type</option>
+                <option value="studio">Private Studio</option>
+                <option value="single">Single Room</option>
+                <option value="bedspace">Bedspace / Shared</option>
+                <option value="condo">Condo Suite / Unit</option>
+                <option value="apartment">Apartment</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Listing Status</label>
+              <select id="prop-status" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-slate-700 focus-ring-terracotta transition">
+                <option value="verified">Active / Available</option>
+                <option value="rented">Rented / Unavailable</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Upload Room Photos (Multiple)</label>
+            <div class="relative border-2 border-dashed border-slate-200 hover:border-terracotta rounded-xl p-4 text-center bg-slate-50 transition cursor-pointer" onclick="document.getElementById('prop-images-input').click()">
+              <input type="file" id="prop-images-input" multiple accept="image/*" class="hidden" onchange="previewImages(event)">
+              <div class="flex flex-col items-center justify-center space-y-1">
+                <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                <span class="text-xs font-bold text-slate-700">Click to upload room images</span>
+                <span class="text-[10px] text-slate-400">Select multiple photos at once</span>
+              </div>
+            </div>
+            <div id="image-preview-container" class="flex gap-2 mt-3 overflow-x-auto"></div>
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Description & Details</label>
+            <textarea id="prop-desc" rows="3" placeholder="Mention inclusions, aircon, bathroom details..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus-ring-terracotta transition"></textarea>
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">House Rules & Terms</label>
+            <textarea id="prop-rules" rows="3" placeholder="e.g. Curfew at 10 PM, visitors allowed until 9 PM, no pets..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus-ring-terracotta transition"></textarea>
+          </div>
+
+          <button id="modal-submit-btn" type="submit" class="w-full bg-terracotta bg-terracotta-hover text-white font-semibold py-3 rounded-xl shadow-lg shadow-terracotta/20 transition-all text-xs">
+            Publish Room Listing
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <script>
+    const API_BASE_URL = 'http://localhost:5000/api';
+    let currentUser = null;
+    let uploadedImagesArray = [];
+    let landlordListingsCache = [];
+    let activeInquiryId = null;
+    let activeThreads = [];
+    let newProfileImageBase64 = null;
+    let modalMap = null;
+    let modalMarker = null;
+
+    const userProfileCache = {};
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const storedUser = localStorage.getItem('user');
+      if (!storedUser) {
+        alert('Please log in to access your landlord control center.');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      currentUser = JSON.parse(storedUser);
+      fetchUserProfileData();
+      fetchLandlordListings();
+      fetchLandlordInbox();
+    });
+
+    async function fetchUserProfileData() {
+      try {
+        const res = await fetch(`${API_BASE_URL}/users/${currentUser.id}`);
+        if (res.ok) {
+          currentUser = await res.json();
+          localStorage.setItem('user', JSON.stringify(currentUser));
+        }
+      } catch(e) {}
+
+      const userName = currentUser.full_name || currentUser.name || 'Landlord';
+      document.getElementById('user-display-name').innerText = userName;
+      
+      const avatarContainer = document.getElementById('header-avatar-container');
+      if (currentUser.profile_image) {
+        avatarContainer.innerHTML = `<img src="${currentUser.profile_image}" class="w-full h-full object-cover">`;
+      } else {
+        avatarContainer.innerHTML = `<span id="user-avatar-initial">${userName.charAt(0).toUpperCase()}</span>`;
+      }
+    }
+
+    async function getUserProfileById(userId) {
+      if (!userId) return null;
+      if (userProfileCache[userId]) return userProfileCache[userId];
+      try {
+        const res = await fetch(`${API_BASE_URL}/users/${userId}`);
+        if (res.ok) {
+          const userObj = await res.json();
+          userProfileCache[userId] = userObj;
+          return userObj;
+        }
+      } catch(e) {}
+      return null;
+    }
+
+    function handleLogout() {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      window.location.href = 'login.html';
+    }
+
+    function toggleInquiriesSection() {
+      const sec = document.getElementById('inquiries-section');
+      sec.classList.toggle('hidden');
+    }
+
+    function parseImage(rawImg) {
+      const fallback = 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80';
+      if (!rawImg) return fallback;
+
+      if (Array.isArray(rawImg)) {
+        return rawImg.length > 0 ? rawImg[0] : fallback;
+      }
+
+      try {
+        const parsed = JSON.parse(rawImg);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed[0];
+        if (typeof parsed === 'string' && parsed.trim() !== '') return parsed;
+      } catch(e) {
+        if (typeof rawImg === 'string' && rawImg.trim() !== '') {
+          return rawImg;
+        }
+      }
+
+      return fallback;
+    }
+
+    function openUserInfoModal(name, email, phone, city, profileImg) {
+      document.getElementById('info-modal-name').innerText = name || 'Renter User';
+      document.getElementById('info-modal-email').innerText = email || 'No email provided';
+      document.getElementById('info-modal-phone').innerText = phone || 'No phone provided';
+      document.getElementById('info-modal-city').innerText = city || 'Metro Manila';
+
+      const avatarImg = document.getElementById('info-modal-avatar');
+      const initialSpan = document.getElementById('info-modal-initial');
+
+      if (profileImg && profileImg !== 'null' && profileImg !== 'undefined') {
+        avatarImg.src = profileImg;
+        avatarImg.classList.remove('hidden');
+        initialSpan.classList.add('hidden');
+      } else {
+        avatarImg.classList.add('hidden');
+        initialSpan.classList.remove('hidden');
+        initialSpan.innerText = name ? name.charAt(0).toUpperCase() : 'U';
+      }
+
+      const modal = document.getElementById('view-user-info-modal');
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+    }
+
+    function closeUserInfoModal() {
+      const modal = document.getElementById('view-user-info-modal');
+      modal.classList.add('opacity-0', 'pointer-events-none');
+    }
+
+    function initModalMapPicker(lat, lng) {
+      const initialLat = lat ? parseFloat(lat) : 14.5764;
+      const initialLng = lng ? parseFloat(lng) : 121.0851;
+
+      document.getElementById('prop-lat').value = initialLat.toFixed(6);
+      document.getElementById('prop-lng').value = initialLng.toFixed(6);
+
+      if (modalMap) {
+        modalMap.remove();
+      }
+
+      modalMap = L.map('modal-map-picker').setView([initialLat, initialLng], 15);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap'
+      }).addTo(modalMap);
+
+      modalMarker = L.marker([initialLat, initialLng], { draggable: true }).addTo(modalMap);
+
+      modalMarker.on('dragend', function (e) {
+        const coord = e.target.getLatLng();
+        document.getElementById('prop-lat').value = coord.lat.toFixed(6);
+        document.getElementById('prop-lng').value = coord.lng.toFixed(6);
+      });
+
+      modalMap.on('click', function (e) {
+        const coord = e.latlng;
+        modalMarker.setLatLng(coord);
+        document.getElementById('prop-lat').value = coord.lat.toFixed(6);
+        document.getElementById('prop-lng').value = coord.lng.toFixed(6);
+      });
+    }
+
+    async function searchLocationOnMap() {
+      const query = document.getElementById('map-search-input').value.trim();
+      if (!query) return;
+
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
+        const results = await res.json();
+
+        if (results && results.length > 0) {
+          const lat = parseFloat(results[0].lat);
+          const lng = parseFloat(results[0].lon);
+
+          document.getElementById('prop-lat').value = lat.toFixed(6);
+          document.getElementById('prop-lng').value = lng.toFixed(6);
+
+          if (modalMap && modalMarker) {
+            modalMap.setView([lat, lng], 16);
+            modalMarker.setLatLng([lat, lng]);
+          }
+        } else {
+          alert('Location not found. Please try a different search term.');
+        }
+      } catch (err) {
+        alert('Error searching location: ' + err.message);
+      }
+    }
+
+    function getCurrentGPSLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            
+            document.getElementById('prop-lat').value = lat.toFixed(6);
+            document.getElementById('prop-lng').value = lng.toFixed(6);
+
+            if (modalMap && modalMarker) {
+              modalMap.setView([lat, lng], 16);
+              modalMarker.setLatLng([lat, lng]);
+            }
+            alert("📍 GPS location pinned successfully!");
+          },
+          (error) => {
+            alert("Error retrieving GPS location: " + error.message);
+          }
+        );
+      } else {
+        alert("Geolocation is not supported by your browser.");
+      }
+    }
+
+    function openProfileModal() {
+      document.getElementById('prof-name').value = currentUser.full_name || currentUser.name || '';
+      document.getElementById('prof-email').value = currentUser.email || '';
+      document.getElementById('prof-phone').value = currentUser.phone_number || '';
+      document.getElementById('prof-city').value = currentUser.city || '';
+      document.getElementById('prof-barangay').value = currentUser.barangay || '';
+
+      const previewImg = document.getElementById('profile-preview-img');
+      previewImg.src = currentUser.profile_image || parseImage(null);
+
+      document.getElementById('profile-modal').classList.remove('opacity-0', 'pointer-events-none');
+      document.getElementById('profile-panel').classList.remove('translate-x-full');
+    }
+
+    function closeProfileModal() {
+      document.getElementById('profile-panel').classList.add('translate-x-full');
+      document.getElementById('profile-modal').classList.add('opacity-0', 'pointer-events-none');
+      newProfileImageBase64 = null;
+    }
+
+    function previewProfileImage(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        newProfileImageBase64 = e.target.result;
+        document.getElementById('profile-preview-img').src = newProfileImageBase64;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function saveProfileChanges(e) {
+      e.preventDefault();
+      const payload = {
+        full_name: document.getElementById('prof-name').value,
+        phone_number: document.getElementById('prof-phone').value,
+        city: document.getElementById('prof-city').value,
+        barangay: document.getElementById('prof-barangay').value,
+        profile_image: newProfileImageBase64 || currentUser.profile_image || null
+      };
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/users/${currentUser.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) throw new Error('Failed to update profile');
+        const data = await res.json();
+        currentUser = data.user;
+        currentUser.name = data.user.full_name;
+        localStorage.setItem('user', JSON.stringify(currentUser));
+
+        alert('Profile updated successfully!');
+        closeProfileModal();
+        fetchUserProfileData();
+      } catch (err) {
+        alert('Error updating profile: ' + err.message);
+      }
+    }
+
+    async function changePassword(e) {
+      e.preventDefault();
+      const current_password = document.getElementById('current-password').value;
+      const new_password = document.getElementById('new-password').value;
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/users/${currentUser.id}/password`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ current_password, new_password })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Failed to change password');
+
+        alert('Password changed successfully!');
+        document.getElementById('password-form').reset();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    async function fetchLandlordInbox() {
+      const container = document.getElementById('threads-container');
+      try {
+        const res = await fetch(`${API_BASE_URL}/inquiries/landlord/${currentUser.id}`);
+        if (!res.ok) throw new Error('Failed to fetch inquiries');
+        activeThreads = await res.json();
+
+        document.getElementById('stat-pending-inquiries').innerText = activeThreads.length;
+
+        if (activeThreads.length === 0) {
+          container.innerHTML = `<p class="text-xs text-slate-400 text-center py-12">No renter inquiries received yet.</p>`;
+          return;
+        }
+
+        container.innerHTML = activeThreads.map(t => {
+          const mainImg = parseImage(t.listing_image);
+          const isSelected = t.id === activeInquiryId;
+
+          return `
+            <div onclick="selectThread(${t.id})" class="p-3.5 rounded-2xl border transition cursor-pointer flex items-center gap-3 ${
+              isSelected ? 'bg-orange-50 border-terracotta shadow-sm' : 'bg-white border-slate-200 hover:border-slate-300'
+            }">
+              <img src="${mainImg}" class="w-12 h-12 rounded-xl object-cover shrink-0">
+              <div class="flex-1 overflow-hidden">
+                <div class="flex items-center justify-between">
+                  <h4 class="font-bold text-xs text-slate-900 truncate">${t.renter_name || 'Renter'}</h4>
+                  <span class="text-[9px] font-semibold text-slate-400">${new Date(t.last_updated || t.created_at).toLocaleDateString()}</span>
+                </div>
+                <p class="text-[11px] font-bold text-terracotta truncate">${t.listing_title || 'Rental Unit'}</p>
+                <p class="text-[10px] text-slate-500 truncate mt-0.5">${t.last_message || 'New inquiry message'}</p>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        if (!activeInquiryId && activeThreads.length > 0) {
+          selectThread(activeThreads[0].id);
+        }
+
+      } catch (err) {
+        container.innerHTML = `<p class="text-xs text-rose-500 text-center py-6">Error loading inbox.</p>`;
+      }
+    }
+
+    async function selectThread(inquiryId) {
+      activeInquiryId = inquiryId;
+      fetchLandlordInbox();
+
+      const thread = activeThreads.find(t => t.id === inquiryId);
+      if (!thread) return;
+
+      if (thread.renter_id) {
+        const renterProfile = await getUserProfileById(thread.renter_id);
+        if (renterProfile) {
+          thread.renter_avatar = renterProfile.profile_image || thread.renter_avatar;
+          thread.renter_email = renterProfile.email || thread.renter_email;
+          thread.renter_phone = renterProfile.phone_number || thread.renter_phone;
+          thread.renter_city = renterProfile.city || thread.renter_city;
+        }
+      }
+
+      const chatWrapper = document.getElementById('active-chat-wrapper');
+      const mainImg = parseImage(thread.listing_image);
+
+      chatWrapper.innerHTML = `
+        <div class="bg-white border border-slate-200 rounded-2xl p-4 mb-4 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <img src="${mainImg}" class="w-16 h-16 rounded-xl object-cover border shrink-0">
+            <div>
+              <span class="text-[9px] font-bold text-terracotta uppercase tracking-wider">${thread.listing_city || 'Metro Manila'}</span>
+              <h3 class="font-bold text-xs sm:text-sm text-slate-900">${thread.listing_title}</h3>
+              <p class="text-xs font-extrabold text-terracotta">₱${Number(thread.listing_price || 0).toLocaleString()} /mo</p>
+            </div>
+          </div>
+          <div class="text-left sm:text-right border-t sm:border-t-0 pt-2 sm:pt-0 w-full sm:w-auto flex flex-col items-start sm:items-end gap-1">
+            <span class="text-[10px] font-bold text-slate-400 uppercase block">Renter Information</span>
+            <p class="text-xs font-bold text-slate-800">${thread.renter_name || 'Prospective Tenant'}</p>
+            <p class="text-[10px] text-slate-500">${thread.renter_email || 'No email provided'}</p>
+            ${thread.renter_phone ? `<p class="text-[10px] font-medium text-terracotta">📞 ${thread.renter_phone}</p>` : ''}
+            
+            <button onclick="openUserInfoModal('${(thread.renter_name || '').replace(/'/g, "\\'")}', '${(thread.renter_email || '').replace(/'/g, "\\'")}', '${(thread.renter_phone || '').replace(/'/g, "\\'")}', '${(thread.renter_city || thread.listing_city || 'Metro Manila').replace(/'/g, "\\'")}', '${thread.renter_avatar || ''}')" class="mt-1 text-[10px] font-bold text-terracotta hover:underline bg-orange-50 hover:bg-orange-100 px-2.5 py-1 rounded-md transition">
+              👁️ View Profile Info
+            </button>
+          </div>
+        </div>
+
+        <div id="messages-container" class="flex-1 bg-white border border-slate-200 rounded-2xl p-4 overflow-y-auto max-h-[260px] space-y-3 mb-4">
+          <p class="text-xs text-slate-400 text-center">Loading messages...</p>
+        </div>
+
+        <form onsubmit="sendThreadMessage(event)" class="flex gap-2">
+          <input type="text" id="chat-reply-input" required placeholder="Type your reply to ${thread.renter_name || 'renter'}..." class="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs focus-ring-terracotta outline-none">
+          <button type="submit" class="bg-slate-900 hover:bg-terracotta text-white font-bold text-xs px-5 py-3 rounded-xl transition">Send Reply</button>
+        </form>
+      `;
+
+      loadThreadMessages(inquiryId, thread);
+    }
+
+    async function loadThreadMessages(inquiryId, thread) {
+      const container = document.getElementById('messages-container');
+      try {
+        const res = await fetch(`${API_BASE_URL}/inquiries/${inquiryId}/messages`);
+        const messages = await res.json();
+
+        container.innerHTML = messages.map(m => {
+          const isLandlord = m.sender_role === 'landlord';
+          const avatarUrl = isLandlord ? (currentUser.profile_image || null) : (thread.renter_avatar || null);
+          const initial = (m.sender_name || 'U').charAt(0).toUpperCase();
+
+          return `
+            <div class="flex items-end gap-2 ${isLandlord ? 'flex-row-reverse' : 'flex-row'} mb-2">
+              <div class="w-7 h-7 rounded-full bg-slate-200 border border-slate-300 overflow-hidden shrink-0 flex items-center justify-center text-[10px] font-bold text-slate-600">
+                ${avatarUrl ? `<img src="${avatarUrl}" class="w-full h-full object-cover">` : `<span>${initial}</span>`}
+              </div>
+
+              <div class="flex flex-col ${isLandlord ? 'items-end' : 'items-start'} max-w-[75%]">
+                <span class="text-[9px] font-bold text-slate-400 mb-0.5">${m.sender_name} (${m.sender_role})</span>
+                <div class="rounded-2xl p-3 text-xs ${
+                  isLandlord ? 'bg-terracotta text-white rounded-tr-none' : 'bg-slate-100 text-slate-800 rounded-tl-none'
+                }">
+                  ${m.message_text}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        container.scrollTop = container.scrollHeight;
+      } catch(err) {
+        container.innerHTML = `<p class="text-xs text-rose-500 text-center">Failed to load chat messages.</p>`;
+      }
+    }
+
+    async function sendThreadMessage(e) {
+      e.preventDefault();
+      if (!activeInquiryId) return;
+
+      const input = document.getElementById('chat-reply-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/inquiries/${activeInquiryId}/messages`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sender_role: 'landlord',
+            sender_name: currentUser.full_name || currentUser.name || 'Landlord',
+            message_text: text
+          })
+        });
+
+        if (!res.ok) throw new Error('Failed to send');
+        input.value = '';
+        const thread = activeThreads.find(t => t.id === activeInquiryId);
+        loadThreadMessages(activeInquiryId, thread);
+        fetchLandlordInbox();
+      } catch (err) {
+        alert('Error sending message: ' + err.message);
+      }
+    }
+
+    function previewImages(event) {
+      const files = event.target.files;
+      const previewContainer = document.getElementById('image-preview-container');
+      previewContainer.innerHTML = '';
+      uploadedImagesArray = [];
+
+      if (!files || files.length === 0) return;
+
+      Array.from(files).forEach((file) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          uploadedImagesArray.push(e.target.result);
+
+          const thumbDiv = document.createElement('div');
+          thumbDiv.className = 'relative w-16 h-16 rounded-lg overflow-hidden border border-slate-200 shrink-0 bg-slate-100';
+          thumbDiv.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">`;
+          previewContainer.appendChild(thumbDiv);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function fetchLandlordListings() {
+      const container = document.getElementById('landlord-listings-container');
+      try {
+        // Updated to fetch only properties belonging to the logged-in landlord
+        const res = await fetch(`${API_BASE_URL}/listings/landlord/${currentUser.id}`);
+        if (!res.ok) throw new Error('Failed to load listings');
+        landlordListingsCache = await res.json();
+
+        document.getElementById('stat-total-props').innerText = landlordListingsCache.length;
+
+        if (!landlordListingsCache || landlordListingsCache.length === 0) {
+          container.innerHTML = `
+            <div class="col-span-full bg-white border border-slate-200 rounded-2xl p-12 text-center">
+              <h3 class="font-bold text-slate-900 text-base mb-1">No properties posted yet</h3>
+              <p class="text-slate-500 text-xs max-w-sm mx-auto mb-4">Click "Post New Room Listing" above to publish your first available room.</p>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = landlordListingsCache.map(room => {
+          const mainImg = parseImage(room.image_url);
+          const isRented = room.status === 'rented';
+
+          return `
+            <div class="bg-white rounded-2xl border border-slate-200/90 overflow-hidden shadow-sm flex flex-col justify-between">
+              <div>
+                <div class="relative h-48 overflow-hidden bg-slate-100">
+                  <img src="${mainImg}" alt="${room.title}" class="w-full h-full object-cover ${isRented ? 'grayscale opacity-75' : ''}">
+                  <span class="absolute top-3 left-3 text-[10px] font-semibold px-2.5 py-1 rounded-md text-white ${
+                    isRented ? 'bg-slate-700' : 'bg-terracotta'
+                  }">
+                    ${isRented ? 'Rented / Unavailable' : 'Active Listing'}
+                  </span>
+                </div>
+                <div class="p-5">
+                  <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-bold text-terracotta uppercase tracking-wider">${room.city || 'Metro Manila'}</span>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">${room.property_type || 'Room'}</span>
+                  </div>
+                  <h3 class="font-bold text-slate-900 text-base mb-1">${room.title}</h3>
+                  <p class="text-xs text-slate-400 font-medium mb-1">Posted by ${currentUser.full_name || currentUser.name}</p>
+                  ${room.latitude && room.longitude ? `<p class="text-[10px] text-emerald-600 font-bold mb-3">📍 GPS: ${room.latitude}, ${room.longitude}</p>` : '<p class="text-[10px] text-slate-400 mb-3">📍 No GPS attached</p>'}
+                  <div class="text-terracotta text-xl font-extrabold">₱${Number(room.price).toLocaleString()} <span class="text-xs text-slate-400 font-normal">/mo</span></div>
+                </div>
+              </div>
+              <div class="p-5 pt-0 border-t border-slate-100 flex items-center justify-between gap-2 mt-2">
+                <button onclick="editListing(${room.id})" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold px-3 py-1.5 rounded-xl transition flex items-center gap-1">
+                  ✏️ Edit Information/Status
+                </button>
+                <div class="flex items-center gap-2">
+                  <a href="room-detail.html?id=${room.id}" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-xl transition">View Details</a>
+                  <button onclick="deleteListing(${room.id})" class="text-rose-500 hover:text-rose-700 text-xs font-semibold transition px-1">🗑️</button>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (err) {
+        container.innerHTML = `
+          <div class="col-span-full bg-white border border-slate-200 rounded-2xl p-12 text-center">
+            <h3 class="font-bold text-slate-900 text-base mb-1">Failed to load properties</h3>
+            <p class="text-slate-500 text-xs">Ensure your backend server is running.</p>
+          </div>
+        `;
+      }
+    }
+
+    function editListing(id) {
+      const room = landlordListingsCache.find(r => r.id === id);
+      if (!room) return;
+
+      document.getElementById('edit-listing-id').value = room.id;
+      document.getElementById('prop-title').value = room.title || '';
+      document.getElementById('prop-city').value = room.city || 'Quezon City';
+      document.getElementById('prop-price').value = room.price || '';
+      document.getElementById('prop-lat').value = room.latitude || '';
+      document.getElementById('prop-lng').value = room.longitude || '';
+      document.getElementById('prop-type').value = room.property_type || 'studio';
+      document.getElementById('prop-status').value = room.status || 'verified';
+      document.getElementById('prop-desc').value = room.description || '';
+      document.getElementById('prop-rules').value = room.house_rules || '';
+
+      document.getElementById('modal-title-heading').innerText = 'Edit Property Listing #' + room.id;
+      document.getElementById('modal-submit-btn').innerText = 'Update Room Listing';
+
+      openAddModal();
+    }
+
+    async function deleteListing(id) {
+      if (!confirm('Are you sure you want to delete this listing?')) return;
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/listings/${id}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error('Failed to delete listing');
+        alert('Listing deleted successfully!');
+        fetchLandlordListings();
+      } catch (err) {
+        alert('Error deleting listing: ' + err.message);
+      }
+    }
+
+    async function saveNewListing(e) {
+      e.preventDefault();
+      
+      const editId = document.getElementById('edit-listing-id').value;
+      const isEdit = Boolean(editId);
+
+      const payload = {
+        landlord_id: currentUser.id || 1,
+        title: document.getElementById('prop-title').value,
+        city: document.getElementById('prop-city').value,
+        barangay: 'Central',
+        monthly_rent: document.getElementById('prop-price').value,
+        property_type: document.getElementById('prop-type').value,
+        status: document.getElementById('prop-status').value,
+        latitude: document.getElementById('prop-lat').value || null,
+        longitude: document.getElementById('prop-lng').value || null,
+        image_url: uploadedImagesArray.length > 0 ? uploadedImagesArray : null,
+        description: document.getElementById('prop-desc').value,
+        house_rules: document.getElementById('prop-rules').value
+      };
+
+      const url = isEdit ? `${API_BASE_URL}/listings/${editId}` : `${API_BASE_URL}/listings`;
+      const method = isEdit ? 'PUT' : 'POST';
+
+      try {
+        const res = await fetch(url, {
+          method: method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.message || 'Failed to save listing');
+        }
+
+        alert(isEdit ? 'Room listing updated successfully!' : 'Room listing published successfully!');
+        closeAddModal();
+        fetchLandlordListings();
+      } catch (err) {
+        console.error("Save listing error:", err);
+        alert('Error saving listing: ' + err.message);
+      }
+    }
+
+    function openAddModal() {
+      document.getElementById('add-modal').classList.remove('opacity-0', 'pointer-events-none');
+      document.getElementById('add-panel').classList.remove('translate-x-full');
+
+      setTimeout(() => {
+        const existingLat = document.getElementById('prop-lat').value;
+        const existingLng = document.getElementById('prop-lng').value;
+        initModalMapPicker(existingLat, existingLng);
+      }, 300);
+    }
+
+    function closeAddModal() {
+      document.getElementById('add-listing-form').reset();
+      document.getElementById('edit-listing-id').value = '';
+      document.getElementById('image-preview-container').innerHTML = '';
+      document.getElementById('map-search-input').value = '';
+      uploadedImagesArray = [];
+      document.getElementById('modal-title-heading').innerText = 'Post a New Room Listing';
+      document.getElementById('modal-submit-btn').innerText = 'Publish Room Listing';
+
+      document.getElementById('add-panel').classList.add('translate-x-full');
+      document.getElementById('add-modal').classList.add('opacity-0', 'pointer-events-none');
+    }
+  </script>
+</body>
+</html>

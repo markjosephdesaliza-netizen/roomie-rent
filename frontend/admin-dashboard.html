@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Portal - Roomie Rent</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .font-serif-custom { font-family: 'Playfair Display', serif; }
+    .text-terracotta { color: #C85A32; }
+    .bg-terracotta { background-color: #C85A32; }
+    .bg-terracotta-hover:hover { background-color: #B24E2A; }
+    .border-terracotta { border-color: #C85A32; }
+    .focus-ring-terracotta:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(200, 90, 50, 0.25);
+    }
+    .zoom-img { transition: transform 0.2s ease-in-out; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col selection:bg-rose-100 selection:text-terracotta">
+
+  <!-- TOP NAVIGATION HEADER -->
+  <header class="sticky top-0 z-40 bg-slate-900 text-white px-6 md:px-10 py-3.5 flex items-center justify-between border-b border-slate-800">
+    <a href="index.html" class="flex items-center space-x-2.5 group">
+      <div class="w-9 h-9 rounded-xl bg-terracotta flex items-center justify-center text-white shadow-md shadow-terracotta/20 group-hover:scale-105 transition-transform">
+        <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20">
+          <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l1.293 1.293a1 1 0 001.414-1.414l-7-7z"/>
+        </svg>
+      </div>
+      <span class="font-bold text-lg tracking-tight">Roomie<span class="text-terracotta">Rent</span> <span class="text-[10px] font-bold bg-slate-800 text-slate-400 px-2 py-0.5 rounded-md uppercase ml-1.5 tracking-wider">Admin</span></span>
+    </a>
+
+    <div class="flex items-center space-x-4">
+      <a href="listings.html" class="text-xs font-semibold text-slate-300 hover:text-white transition flex items-center gap-1.5">
+        <svg class="w-4 h-4 stroke-2 stroke-current" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+        <span>Go to Home Page</span>
+      </a>
+
+      <div class="h-4 w-[1px] bg-slate-800"></div>
+
+      <div class="flex items-center space-x-3">
+        <div class="w-8 h-8 rounded-full bg-terracotta text-white font-bold text-xs flex items-center justify-center">
+          A
+        </div>
+        <span id="admin-display-name" class="text-xs font-bold text-slate-200 hidden sm:inline">System Administrator</span>
+        <button onclick="handleLogout()" class="text-xs font-semibold text-slate-400 hover:text-rose-400 transition">Log Out</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- DASHBOARD CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+    
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-200">
+      <div>
+        <div class="inline-flex items-center gap-1.5 bg-slate-900 text-white text-[10px] font-bold px-2.5 py-1 rounded-md mb-2 tracking-wider uppercase">
+          🛡️ Platform System Management & Verification
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">System Control Panel</h1>
+        <p class="text-xs text-slate-500 font-medium mt-1">Verify new landlord credentials, moderate room listings, and manage real-time platform users.</p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button onclick="alert('Data exported as CSV successfully!')" class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm transition">
+          Export System Report
+        </button>
+      </div>
+    </div>
+
+    <!-- METRICS CARDS -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Total Active Rooms</span>
+        <div class="flex items-baseline justify-between">
+          <span id="stat-total-rooms" class="text-2xl font-extrabold text-slate-900">0</span>
+          <span class="text-xs font-semibold text-emerald-600">Live database</span>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Registered Renters</span>
+        <div class="flex items-baseline justify-between">
+          <span id="stat-total-renters" class="text-2xl font-extrabold text-slate-900">0</span>
+          <span id="stat-online-renters" class="text-xs font-medium text-emerald-600">0 Online</span>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Registered Landlords</span>
+        <div class="flex items-baseline justify-between">
+          <span id="stat-total-landlords" class="text-2xl font-extrabold text-slate-900">0</span>
+          <span id="stat-pending-landlords" class="text-xs font-semibold text-amber-600">0 Pending</span>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Flagged Reports</span>
+        <div class="flex items-baseline justify-between">
+          <span class="text-2xl font-extrabold text-slate-900">0</span>
+          <span class="text-xs font-medium text-emerald-600">All clear</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- NAVIGATION TABS -->
+    <div class="border-b border-slate-200 mb-6">
+      <nav class="flex space-x-8 text-xs sm:text-sm font-bold overflow-x-auto">
+        <button onclick="switchTab('tab-listings')" id="btn-tab-listings" class="tab-btn text-terracotta border-b-2 border-terracotta pb-3 transition whitespace-nowrap">
+          Active Room Moderation
+        </button>
+        <button onclick="switchTab('tab-users')" id="btn-tab-users" class="tab-btn text-slate-400 hover:text-slate-800 pb-3 transition whitespace-nowrap">
+          User Management & Verification
+        </button>
+        <button onclick="switchTab('tab-reports')" id="btn-tab-reports" class="tab-btn text-slate-400 hover:text-slate-800 pb-3 transition whitespace-nowrap">
+          <span>Disputes & Reports</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- TAB 1: LISTINGS -->
+    <div id="tab-listings" class="tab-content space-y-4">
+      <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+              <th class="p-4">Property Name</th>
+              <th class="p-4">Location</th>
+              <th class="p-4">Monthly Rate</th>
+              <th class="p-4">Status</th>
+              <th class="p-4 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="admin-listings-table" class="divide-y divide-slate-100 text-xs font-medium">
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 2: USER MANAGEMENT WITH DIRECTORY SEARCH & SUB-TABS -->
+    <div id="tab-users" class="tab-content hidden space-y-4">
+      
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
+        <div class="flex items-center gap-3">
+          <button onclick="switchUserTab('renters')" id="btn-sub-renters" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white shadow-sm transition">
+            Renters Directory (<span id="count-renters">0</span>)
+          </button>
+          <button onclick="switchUserTab('landlords')" id="btn-sub-landlords" class="px-4 py-2 rounded-xl text-xs font-bold bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition">
+            Landlords Directory (<span id="count-landlords">0</span>)
+          </button>
+        </div>
+
+        <!-- SEARCH BUTTON / INPUT FIELD -->
+        <div class="relative w-full md:w-80">
+          <input type="text" id="user-search-input" onkeyup="filterUsers()" placeholder="Search renter or landlord (name, email, phone)..." class="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-4 py-2 text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 shadow-sm transition">
+          <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- RENTERS TABLE -->
+      <div id="subtab-renters" class="user-subtab bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+              <th class="p-4">Renter Name</th>
+              <th class="p-4">Email Address</th>
+              <th class="p-4">Mobile Phone</th>
+              <th class="p-4">Online Status</th>
+              <th class="p-4 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="admin-renters-table" class="divide-y divide-slate-100 text-xs font-medium"></tbody>
+        </table>
+      </div>
+
+      <!-- LANDLORDS TABLE (UPDATED WITH ALL 7 SPECIFIED COLUMNS) -->
+      <div id="subtab-landlords" class="user-subtab hidden bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+              <th class="p-4">Landlord Name</th>
+              <th class="p-4">Email Address</th>
+              <th class="p-4">Mobile Phone</th>
+              <th class="p-4">Online Status</th>
+              <th class="p-4">ID Type & Number</th>
+              <th class="p-4">Verification Status</th>
+              <th class="p-4 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="admin-landlords-table" class="divide-y divide-slate-100 text-xs font-medium"></tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- TAB 3: REPORTS -->
+    <div id="tab-reports" class="tab-content hidden space-y-4">
+      <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm p-8 text-center">
+        <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center mx-auto mb-3 font-bold">🛡️</div>
+        <h3 class="font-bold text-slate-900 text-base mb-1">No open reports or disputes</h3>
+        <p class="text-slate-500 text-xs max-w-sm mx-auto">Flagged room or user reports submitted by renters and landlords will appear here for review.</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- LANDLORD CREDENTIAL INSPECTION MODAL -->
+  <div id="verification-modal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
+        <div>
+          <span class="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded uppercase">KYC Credential Review</span>
+          <h3 id="modal-landlord-name" class="text-xl font-bold text-slate-950 mt-1">Landlord Name</h3>
+        </div>
+        <button onclick="closeVerificationModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 transition">✕</button>
+      </div>
+
+      <div class="space-y-4 text-xs">
+        <div class="grid grid-cols-2 gap-4 bg-slate-50 p-3 rounded-2xl">
+          <div><strong class="text-slate-400 block uppercase text-[10px]">Email Address</strong> <span id="modal-email" class="font-semibold text-slate-800">-</span></div>
+          <div><strong class="text-slate-400 block uppercase text-[10px]">Mobile Number</strong> <span id="modal-phone" class="font-semibold text-slate-800">-</span></div>
+          <div><strong class="text-slate-400 block uppercase text-[10px]">ID Type</strong> <span id="modal-id-type" class="font-semibold text-slate-800">-</span></div>
+          <div><strong class="text-slate-400 block uppercase text-[10px]">ID Number</strong> <span id="modal-id-number" class="font-semibold text-slate-800">-</span></div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="block font-bold text-slate-700 uppercase text-[10px]">Government ID (Front & Back)</label>
+            <span class="text-[10px] text-terracotta font-semibold">🔍 Click any image to enlarge & zoom</span>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="cursor-pointer group relative overflow-hidden rounded-xl border border-slate-200 bg-slate-100" onclick="openLightbox(document.getElementById('modal-front-img').src, 'Front Government ID')">
+              <span class="text-[10px] text-slate-400 p-2 block">Front Photo</span>
+              <img id="modal-front-img" src="" class="w-full h-32 object-cover transition group-hover:scale-105">
+              <div class="absolute inset-0 bg-slate-900/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold text-xs">🔍 Click to Zoom</div>
+            </div>
+            <div class="cursor-pointer group relative overflow-hidden rounded-xl border border-slate-200 bg-slate-100" onclick="openLightbox(document.getElementById('modal-back-img').src, 'Back Government ID')">
+              <span class="text-[10px] text-slate-400 p-2 block">Back Photo</span>
+              <img id="modal-back-img" src="" class="w-full h-32 object-cover transition group-hover:scale-105">
+              <div class="absolute inset-0 bg-slate-900/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold text-xs">🔍 Click to Zoom</div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1.5 uppercase text-[10px]">Proof of Property Ownership / Lease Permit</label>
+          <div class="cursor-pointer group relative overflow-hidden rounded-xl border border-slate-200 bg-slate-100" onclick="openLightbox(document.getElementById('modal-proof-img').src, 'Proof of Property Ownership')">
+            <img id="modal-proof-img" src="" class="w-full h-40 object-cover transition group-hover:scale-105">
+            <div class="absolute inset-0 bg-slate-900/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold text-xs">🔍 Click to Zoom Document</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-slate-100">
+        <button onclick="updateLandlordVerification(currentSelectedLandlordId, false)" class="px-5 py-2.5 rounded-xl bg-rose-50 text-rose-700 font-bold hover:bg-rose-100 transition">Reject Account</button>
+        <button onclick="updateLandlordVerification(currentSelectedLandlordId, true)" class="px-5 py-2.5 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-700 shadow-sm transition">Approve & Verify Account</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLICK-TO-ZOOM LIGHTBOX MODAL -->
+  <div id="lightbox-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[60] flex flex-col items-center justify-center p-4 hidden">
+    <div class="w-full max-w-4xl flex items-center justify-between text-white mb-4">
+      <h4 id="lightbox-title" class="font-bold text-sm">Image Preview</h4>
+      <div class="flex items-center gap-3">
+        <button onclick="zoomLightbox(1.2)" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-bold text-white transition">Zoom In +</button>
+        <button onclick="zoomLightbox(0.8)" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-bold text-white transition">Zoom Out -</button>
+        <button onclick="resetLightboxZoom()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-bold text-slate-300 transition">Reset</button>
+        <button onclick="closeLightbox()" class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-white font-bold hover:bg-slate-700 transition">✕</button>
+      </div>
+    </div>
+    <div class="overflow-auto max-h-[80vh] max-w-full flex items-center justify-center p-2 rounded-2xl bg-black/40 border border-slate-800">
+      <img id="lightbox-img" src="" class="zoom-img max-h-[75vh] object-contain rounded-lg">
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-slate-950 text-slate-400 text-xs py-8 px-6 md:px-12 border-t border-slate-800 mt-12">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center space-x-2">
+        <div class="w-6 h-6 rounded-lg bg-terracotta flex items-center justify-center text-white font-bold text-xs">R</div>
+        <span class="font-bold text-sm text-white">RoomieRent Admin</span>
+      </div>
+      <p>&copy; 2026 Roomie Rent Philippines. Internal Admin Console.</p>
+    </div>
+  </footer>
+
+  <script>
+    const API_BASE_URL = 'http://localhost:5000/api';
+    let allUsers = [];
+    let currentSelectedLandlordId = null;
+    let currentZoomLevel = 1;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const storedUser = localStorage.getItem('user');
+      if (!storedUser) {
+        alert('Please log in as an administrator to access the admin portal.');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const user = JSON.parse(storedUser);
+      document.getElementById('admin-display-name').innerText = user.name || user.full_name || 'Administrator';
+
+      // Start Real-Time Activity Heartbeat every 15 seconds
+      sendHeartbeat();
+      setInterval(sendHeartbeat, 15000);
+
+      fetchAdminListings();
+      fetchAdminUsers();
+
+      // Poll users every 10 seconds for real-time status updates
+      setInterval(fetchAdminUsers, 10000);
+    });
+
+    async function sendHeartbeat() {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      if (user.id) {
+        try {
+          await fetch(`${API_BASE_URL}/users/heartbeat`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: user.id })
+          });
+        } catch (e) {}
+      }
+    }
+
+    function handleLogout() {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      window.location.href = 'login.html';
+    }
+
+    async function fetchAdminListings() {
+      const tableBody = document.getElementById('admin-listings-table');
+      try {
+        const response = await fetch(`${API_BASE_URL}/listings`);
+        if (!response.ok) throw new Error('Failed to load listings');
+        const listings = await response.json();
+
+        document.getElementById('stat-total-rooms').innerText = listings.length;
+
+        if (listings.length === 0) {
+          tableBody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400">No active rooms found in database.</td></tr>`;
+          return;
+        }
+
+        tableBody.innerHTML = listings.map(room => `
+          <tr class="hover:bg-slate-50/80 transition">
+            <td class="p-4 font-bold text-slate-900">${room.title}</td>
+            <td class="p-4 text-slate-600">${room.city || 'Metro Manila'}</td>
+            <td class="p-4 text-terracotta font-bold">₱${Number(room.price).toLocaleString()}</td>
+            <td class="p-4"><span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Live & Verified</span></td>
+            <td class="p-4 text-right space-x-2">
+              <a href="room-detail.html?id=${room.id}" class="text-slate-600 hover:text-slate-900 font-semibold">View</a>
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        tableBody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-rose-500">Could not connect to backend server.</td></tr>`;
+      }
+    }
+
+    async function fetchAdminUsers() {
+      try {
+        const res = await fetch(`${API_BASE_URL}/users`);
+        if (!res.ok) throw new Error('Failed to fetch users');
+        allUsers = await res.json();
+
+        const renters = allUsers.filter(u => u.role === 'renter');
+        const landlords = allUsers.filter(u => u.role === 'landlord');
+        const pendingLandlords = landlords.filter(l => l.is_verified === false);
+        const onlineRenters = renters.filter(r => r.is_online);
+
+        document.getElementById('stat-total-renters').innerText = renters.length;
+        document.getElementById('stat-online-renters').innerText = `${onlineRenters.length} Online`;
+        document.getElementById('stat-total-landlords').innerText = landlords.length;
+        document.getElementById('stat-pending-landlords').innerText = `${pendingLandlords.length} Pending`;
+        document.getElementById('count-renters').innerText = renters.length;
+        document.getElementById('count-landlords').innerText = landlords.length;
+
+        filterUsers();
+      } catch (err) {
+        console.error("Error loading users:", err);
+      }
+    }
+
+    // SEARCH FILTER FUNCTION
+    function filterUsers() {
+      const query = document.getElementById('user-search-input').value.toLowerCase().trim();
+
+      const renters = allUsers.filter(u => u.role === 'renter' && (
+        (u.full_name || u.name || '').toLowerCase().includes(query) ||
+        (u.email || '').toLowerCase().includes(query) ||
+        (u.phone_number || '').toLowerCase().includes(query)
+      ));
+
+      const landlords = allUsers.filter(u => u.role === 'landlord' && (
+        (u.full_name || u.name || '').toLowerCase().includes(query) ||
+        (u.email || '').toLowerCase().includes(query) ||
+        (u.phone_number || '').toLowerCase().includes(query) ||
+        (u.id_type || '').toLowerCase().includes(query) ||
+        (u.id_number || '').toLowerCase().includes(query)
+      ));
+
+      renderRentersTable(renters);
+      renderLandlordsTable(landlords);
+    }
+
+    function renderRentersTable(renters) {
+      const tbody = document.getElementById('admin-renters-table');
+      if (renters.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400">No matching renters found.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = renters.map(r => {
+        const isOnline = r.is_online === true;
+        const statusBadge = isOnline
+          ? `<span class="inline-flex items-center gap-1.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span> Online</span>`
+          : `<span class="inline-flex items-center gap-1.5 bg-slate-100 text-slate-500 text-[10px] font-bold px-2.5 py-0.5 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> Offline</span>`;
+
+        const name = r.full_name || r.name || 'Renter';
+
+        return `
+          <tr class="hover:bg-slate-50/80 transition">
+            <td class="p-4 font-bold text-slate-900">${name}</td>
+            <td class="p-4 text-slate-600">${r.email}</td>
+            <td class="p-4 text-slate-600">${r.phone_number || 'Not provided'}</td>
+            <td class="p-4">${statusBadge}</td>
+            <td class="p-4 text-right space-x-2">
+              <button onclick="terminateAccount(${r.id}, '${name}')" class="bg-rose-50 text-rose-600 hover:bg-rose-100 px-3 py-1.5 rounded-xl font-bold transition">Terminate</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderLandlordsTable(landlords) {
+      const tbody = document.getElementById('admin-landlords-table');
+      if (landlords.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400">No matching landlords found.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = landlords.map(l => {
+        const isVerified = l.is_verified === true;
+        const name = l.full_name || l.name || 'Landlord';
+        
+        const isOnline = l.is_online === true;
+        const onlineBadge = isOnline
+          ? `<span class="inline-flex items-center gap-1.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span> Online</span>`
+          : `<span class="inline-flex items-center gap-1.5 bg-slate-100 text-slate-500 text-[10px] font-bold px-2.5 py-0.5 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> Offline</span>`;
+
+        const idBadge = isVerified 
+          ? `<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full">Verified Account</span>`
+          : `<span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full animate-pulse">Pending Verification</span>`;
+
+        return `
+          <tr class="hover:bg-slate-50/80 transition">
+            <td class="p-4 font-bold text-slate-900">${name}</td>
+            <td class="p-4 text-slate-600">${l.email}</td>
+            <td class="p-4 text-slate-600">${l.phone_number || 'Not provided'}</td>
+            <td class="p-4">${onlineBadge}</td>
+            <td class="p-4 text-slate-600">${l.id_type || 'ID'} : ${l.id_number || 'N/A'}</td>
+            <td class="p-4">${idBadge}</td>
+            <td class="p-4 text-right space-x-2">
+              <button onclick='openVerificationModal(${JSON.stringify(l)})' class="bg-slate-900 text-white px-3 py-1.5 rounded-xl font-bold hover:bg-slate-800 transition">Review</button>
+              <button onclick="terminateAccount(${l.id}, '${name}')" class="bg-rose-50 text-rose-600 hover:bg-rose-100 px-3 py-1.5 rounded-xl font-bold transition">Terminate</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function terminateAccount(userId, userName) {
+      if (!confirm(`⚠️ WARNING: Are you sure you want to permanently terminate the account for "${userName}"? This will delete their profile and associated listings.`)) {
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_BASE_URL}/admin/users/${userId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Failed to terminate account.');
+
+        alert(data.message);
+        fetchAdminUsers();
+        fetchAdminListings();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    function openVerificationModal(landlord) {
+      currentSelectedLandlordId = landlord.id;
+      document.getElementById('modal-landlord-name').innerText = landlord.full_name || landlord.name;
+      document.getElementById('modal-email').innerText = landlord.email;
+      document.getElementById('modal-phone').innerText = landlord.phone_number || 'Not provided';
+      document.getElementById('modal-id-type').innerText = landlord.id_type || 'Not specified';
+      document.getElementById('modal-id-number').innerText = landlord.id_number || 'Not provided';
+
+      document.getElementById('modal-front-img').src = landlord.id_front_image || 'https://via.placeholder.com/400x250?text=No+Front+ID+Uploaded';
+      document.getElementById('modal-back-img').src = landlord.id_back_image || 'https://via.placeholder.com/400x250?text=No+Back+ID+Uploaded';
+      document.getElementById('modal-proof-img').src = landlord.property_proof_image || 'https://via.placeholder.com/600x300?text=No+Property+Proof+Uploaded';
+
+      document.getElementById('verification-modal').classList.remove('hidden');
+    }
+
+    function closeVerificationModal() {
+      document.getElementById('verification-modal').classList.add('hidden');
+    }
+
+    // LIGHTBOX ZOOM CONTROLS
+    function openLightbox(imgSrc, title) {
+      if (!imgSrc || imgSrc.includes('placeholder')) return;
+      document.getElementById('lightbox-img').src = imgSrc;
+      document.getElementById('lightbox-title').innerText = title;
+      resetLightboxZoom();
+      document.getElementById('lightbox-modal').classList.remove('hidden');
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightbox-modal').classList.add('hidden');
+    }
+
+    function zoomLightbox(factor) {
+      currentZoomLevel *= factor;
+      document.getElementById('lightbox-img').style.transform = `scale(${currentZoomLevel})`;
+    }
+
+    function resetLightboxZoom() {
+      currentZoomLevel = 1;
+      document.getElementById('lightbox-img').style.transform = `scale(1)`;
+    }
+
+    async function updateLandlordVerification(landlordId, isVerified) {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_BASE_URL}/admin/verify-landlord/${landlordId}`, {
+          method: 'PUT',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ is_verified: isVerified })
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Failed to update verification status.');
+
+        alert(data.message);
+        closeVerificationModal();
+        fetchAdminUsers();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+      document.getElementById(tabId).classList.remove('hidden');
+
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        b.className = "tab-btn text-slate-400 hover:text-slate-800 pb-3 transition whitespace-nowrap";
+      });
+      document.getElementById('btn-' + tabId).className = "tab-btn text-terracotta border-b-2 border-terracotta pb-3 transition whitespace-nowrap";
+    }
+
+    function switchUserTab(type) {
+      document.querySelectorAll('.user-subtab').forEach(t => t.classList.add('hidden'));
+      document.getElementById('subtab-' + type).classList.remove('hidden');
+
+      const btnRenters = document.getElementById('btn-sub-renters');
+      const btnLandlords = document.getElementById('btn-sub-landlords');
+
+      if (type === 'renters') {
+        btnRenters.className = "px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white shadow-sm transition";
+        btnLandlords.className = "px-4 py-2 rounded-xl text-xs font-bold bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition";
+      } else {
+        btnLandlords.className = "px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white shadow-sm transition";
+        btnRenters.className = "px-4 py-2 rounded-xl text-xs font-bold bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition";
+      }
+    }
+  </script>
+</body>
+</html>

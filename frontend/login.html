@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roomie Rent - Authentication</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FAFAFA; }
+    .font-serif-custom { font-family: 'Playfair Display', serif; }
+    .font-mono-label { font-family: 'JetBrains Mono', monospace; }
+    .bg-terracotta { background-color: #C85A32; }
+    .bg-terracotta-hover:hover { background-color: #B24E2A; }
+    .text-terracotta { color: #C85A32; }
+    .border-terracotta { border-color: #C85A32; }
+    .focus-ring-terracotta:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(200, 90, 50, 0.2);
+    }
+  </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen selection:bg-orange-100 selection:text-terracotta">
+
+  <div class="min-h-screen grid grid-cols-1 lg:grid-cols-12">
+    
+    <!-- LEFT SIDE SHOWCASE PANEL -->
+    <div class="hidden lg:flex lg:col-span-5 bg-slate-900 relative flex-col justify-between p-12 overflow-hidden text-white">
+      <div class="absolute inset-0 z-0">
+        <img src="https://i.pinimg.com/736x/0e/e8/30/0ee830dac6e7451876d787a7fef719d4.jpg" alt="Interior showcase" class="w-full h-full object-cover opacity-100">
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/80 to-slate-900/60"></div>
+      </div>
+
+      <div class="relative z-10">
+        <a href="index.html" class="flex items-center space-x-2.5 group">
+          <div class="w-10 h-10 rounded-2xl bg-terracotta flex items-center justify-center text-white shadow-lg shadow-terracotta/30 group-hover:scale-105 transition-transform">
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20">
+              <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l1.293 1.293a1 1 0 001.414-1.414l-7-7z"/>
+            </svg>
+          </div>
+          <span class="font-bold text-xl tracking-tight text-white">Roomie<span class="text-terracotta">Rent</span></span>
+        </a>
+      </div>
+
+      <div class="relative z-10 max-w-md my-auto">
+        <span class="inline-block bg-white/10 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider text-terracotta border border-white/10 mb-4">Secure Rental Portal</span>
+        <h2 class="text-3xl font-bold font-serif-custom leading-tight mb-4">Find reliable roomies & verified stays in Manila</h2>
+        <p class="text-slate-300 text-sm leading-relaxed mb-6">Connect directly with landlords, view budget-friendly bedspaces, and save your favorite room choices with zero hidden fees.</p>
+        
+        <div class="flex items-center gap-3 bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-md">
+          <div class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm">✓</div>
+          <p class="text-xs text-slate-300">Strict admin-verified host ID credentials and anti-scam protection.</p>
+        </div>
+      </div>
+
+      <div class="relative z-10 text-xs text-slate-400">
+        &copy; 2026 Roomie Rent.
+      </div>
+    </div>
+
+    <!-- RIGHT SIDE AUTHENTICATION PANEL -->
+    <div class="lg:col-span-7 flex flex-col justify-between p-6 sm:p-10 md:p-12 bg-white">
+      
+      <div class="flex justify-between items-center mb-8">
+        <a href="index.html" class="flex lg:hidden items-center space-x-2">
+          <div class="w-8 h-8 rounded-xl bg-terracotta flex items-center justify-center text-white">
+            <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l1.293 1.293a1 1 0 001.414-1.414l-7-7z"/></svg>
+          </div>
+          <span class="font-bold text-base text-slate-900">Roomie<span class="text-terracotta">Rent</span></span>
+        </a>
+        <a href="index.html" class="text-xs font-semibold text-slate-500 hover:text-terracotta transition flex items-center gap-1.5 ml-auto">
+          <span>&larr;</span> Back to Home
+        </a>
+      </div>
+
+      <div class="w-full max-w-[480px] mx-auto my-auto py-4">
+
+        <div class="mb-6">
+          <h1 id="page-title" class="text-3xl font-bold tracking-tight text-slate-900 mb-1">Welcome back</h1>
+          <p id="page-subtitle" class="text-slate-500 text-sm">Sign in to manage your rental stays and inquiries.</p>
+        </div>
+
+        <div id="auth-alert" class="hidden mb-4 p-3 rounded-xl text-xs font-medium"></div>
+
+        <!-- STEP INDICATOR -->
+        <div id="step-indicator" class="flex items-center justify-center space-x-3 mb-6 hidden">
+          <div class="flex items-center space-x-2">
+            <div id="badge-step1" class="w-7 h-7 rounded-full bg-terracotta text-white font-medium text-xs flex items-center justify-center shadow-sm">1</div>
+            <span id="text-step1" class="text-xs font-semibold text-slate-800">Account type</span>
+          </div>
+          <div id="step-line" class="w-12 h-[2px] bg-stone-200 transition-colors"></div>
+          <div class="flex items-center space-x-2">
+            <div id="badge-step2" class="w-7 h-7 rounded-full bg-stone-200 text-stone-500 font-medium text-xs flex items-center justify-center transition-colors">2</div>
+            <span id="text-step2" class="text-xs font-medium text-stone-400 transition-colors">Your details & ID</span>
+          </div>
+        </div>
+
+        <!-- LOG IN VIEW -->
+        <div id="view-login">
+          <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 tracking-wider font-mono-label mb-2 uppercase">SIGN IN AS</label>
+              <div class="grid grid-cols-2 gap-1.5 bg-slate-100 p-1.5 rounded-2xl text-xs font-semibold">
+                <button type="button" onclick="setLoginRole('renter')" id="login-role-renter" class="py-2.5 rounded-xl bg-white text-slate-900 shadow-sm transition-all">Renter</button>
+                <button type="button" onclick="setLoginRole('landlord')" id="login-role-landlord" class="py-2.5 rounded-xl text-slate-500 hover:text-slate-900 transition-all">Landlord</button>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 tracking-wider font-mono-label mb-1.5 uppercase">EMAIL ADDRESS</label>
+              <input id="login-email" type="email" required placeholder="pedrodelacruz@email.com" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:bg-white focus-ring-terracotta transition">
+            </div>
+
+            <div>
+              <div class="flex justify-between items-center mb-1.5">
+                <label class="block text-[10px] font-bold text-slate-400 tracking-wider font-mono-label uppercase">PASSWORD</label>
+                <button type="button" onclick="openForgotPasswordModal()" class="text-xs text-terracotta font-medium hover:underline">Forgot password?</button>
+              </div>
+              <div class="relative">
+                <input id="login-password" type="password" required placeholder="••••••••" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:bg-white focus-ring-terracotta transition">
+                <button type="button" onclick="togglePassword('login-password')" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600 font-medium">Show</button>
+              </div>
+            </div>
+
+            <button type="submit" id="login-submit-btn" class="w-full bg-terracotta bg-terracotta-hover text-white font-semibold py-3.5 rounded-2xl shadow-lg shadow-terracotta/20 transition-all mt-2">
+              Sign In as Renter
+            </button>
+          </form>
+
+          <p class="text-center text-xs text-slate-500 mt-6">
+            Don't have an account? <button onclick="switchToRegister()" class="text-terracotta font-semibold hover:underline">Create one</button>
+          </p>
+        </div>
+
+        <!-- REGISTER STEP 1 (Role Selection) -->
+        <div id="view-reg-step1" class="hidden">
+          <label class="block text-[10px] font-bold text-slate-400 tracking-wider font-mono-label mb-3 uppercase">REGISTERING AS</label>
+          
+          <div class="grid grid-cols-2 gap-3 mb-5">
+            <button type="button" onclick="selectRegisterRole('renter')" id="card-renter" class="p-4 rounded-2xl border-2 text-left transition-all border-terracotta bg-orange-50/40">
+              <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center mb-3">
+                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/></svg>
+              </div>
+              <h3 class="font-bold text-slate-900 text-sm mb-1">Renter</h3>
+              <p class="text-[11px] text-slate-500 leading-snug">Looking for a room to rent</p>
+            </button>
+
+            <button type="button" onclick="selectRegisterRole('landlord')" id="card-landlord" class="p-4 rounded-2xl border-2 text-left transition-all border-slate-200 hover:border-slate-300">
+              <div class="w-8 h-8 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center mb-3">
+                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1a1 1 0 000 2h2a1 1 0 100-2H7zm0 4a1 1 0 100 2h2a1 1 0 100-2H7zm0 4a1 1 0 100 2h2a1 1 0 100-2H7z"/></svg>
+              </div>
+              <h3 class="font-bold text-slate-900 text-sm mb-1">Landlord</h3>
+              <p class="text-[11px] text-slate-500 leading-snug">I have rooms available (Requires ID verification)</p>
+            </button>
+          </div>
+
+          <div id="info-box" class="bg-blue-50 border border-blue-100 rounded-2xl p-4 text-xs text-blue-700 leading-relaxed mb-6">
+            As a Renter you can search listings, save favorites, and message landlords directly.
+          </div>
+
+          <button type="button" onclick="goToStep2()" id="btn-continue-step1" class="w-full bg-terracotta bg-terracotta-hover text-white font-semibold py-3.5 rounded-2xl shadow-lg shadow-terracotta/20 transition-all flex items-center justify-center space-x-1">
+            <span>Continue as Renter</span>
+            <span>&rarr;</span>
+          </button>
+
+          <p class="text-center text-xs text-slate-500 mt-6">
+            Already have an account? <button onclick="switchToLogin()" class="text-terracotta font-semibold hover:underline">Sign in</button>
+          </p>
+        </div>
+
+        <!-- REGISTER STEP 2 (Details Form + Landlord Verification ID Uploads) -->
+        <div id="view-reg-step2" class="hidden">
+          
+          <div class="flex items-center justify-between mb-4">
+            <button type="button" onclick="goToStep1()" class="text-xs font-semibold text-slate-600 hover:text-terracotta transition-colors flex items-center space-x-1.5 py-1 px-2 -ml-2 rounded-lg hover:bg-slate-100">
+              <span class="text-sm">&larr;</span>
+              <span>Back</span>
+            </button>
+
+            <div id="badge-selected-role" class="px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 flex items-center space-x-1.5">
+              <span>👤</span>
+              <span id="text-selected-role">Renter</span>
+            </div>
+          </div>
+
+          <form id="form-register" onsubmit="handleRegister(event)" class="space-y-3">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 tracking-wider font-mono-label mb-1 uppercase">FULL NAME</label>
+              <input id="reg-name" type="text" required placeholder="Pedro A. Dela Cruz" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:bg-white focus-ring-terracotta transition">
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 tracking-wider font-mono-label mb-1 uppercase">EMAIL ADDRESS</label>
+              <input id="reg-email" type="email" required placeholder="pedrodelacruz@email.com" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:bg-white focus-ring-terracotta transition">
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 tracking-wider font-mono-label mb-1 uppercase">MOBILE NUMBER</label>
+              <input id="reg-phone" type="tel" placeholder="+63 9XX XXX XXXX" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:bg-white focus-ring-terracotta transition">
+            </div>
+
+            <div id="landlord-location-fields" class="grid grid-cols-2 gap-3 hidden">
+              <div>
+                <label class="block text-[10px] font-bold text-slate-400 tracking-wider font-mono-label mb-1 uppercase">CITY</label>
+                <input id="reg-city" type="text" placeholder="Pasig City" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2.5 text-sm text-slate-800 focus:bg-white focus-ring-terracotta transition">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-slate-400 tracking-wider font-mono-label mb-1 uppercase">BARANGAY</label>
+                <input id="reg-barangay" type="text" placeholder="Barangay Name" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2.5 text-sm text-slate-800 focus:bg-white focus-ring-terracotta transition">
+              </div>
+            </div>
+
+            <!-- LANDLORD VERIFICATION & CREDENTIAL UPLOADS SECTION -->
+            <div id="landlord-verification-section" class="border border-orange-200 bg-orange-50/30 p-4 rounded-2xl space-y-3 hidden">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="text-terracotta font-bold text-sm">🛡️ Landlord Anti-Scam Verification</span>
+              </div>
+              <p class="text-[11px] text-slate-500 leading-relaxed">To protect renters from fraudulent listings, landlords must submit a valid government-issued ID and property proof. Accounts require admin approval before login access is granted.</p>
+
+              <div>
+                <label class="block text-[10px] font-bold text-slate-400 tracking-wider font-mono-label mb-1 uppercase">GOVERNMENT ID TYPE</label>
+                <select id="reg-id-type" class="w-full bg-white border border-slate-200 rounded-2xl px-4 py-2.5 text-sm text-slate-800 focus-ring-terracotta transition">
+                  <option value="UMID">UMID ID</option>
+                  <option value="Driver's License">Driver's License</option>
+                  <option value="Passport">Passport</option>
+                  <option value="SSS ID">SSS ID</option>
+                  <option value="PhilHealth">PhilHealth ID</option>
+                  <option value="PRC ID">PRC ID</option>
+                  <option value="Postal ID">Postal ID</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-[10px] font-bold text-slate-400 tracking-wider font-mono-label mb-1 uppercase">VALID ID NUMBER</label>
+                <input id="reg-id-number" type="text" placeholder="e.g. N02-12-345678" class="w-full bg-white border border-slate-200 rounded-2xl px-4 py-2.5 text-sm text-slate-800 focus-ring-terracotta transition">
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-400 tracking-wider font-mono-label mb-1 uppercase">VALID ID (FRONT)</label>
+                  <input id="reg-id-front" type="file" accept="image/*" onchange="previewImage(event, 'front-preview')" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-orange-100 file:text-terracotta hover:file:bg-orange-200 cursor-pointer">
+                  <img id="front-preview" class="w-full h-16 object-cover rounded-xl mt-1.5 hidden border border-slate-200">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-400 tracking-wider font-mono-label mb-1 uppercase">VALID ID (BACK)</label>
+                  <input id="reg-id-back" type="file" accept="image/*" onchange="previewImage(event, 'back-preview')" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-orange-100 file:text-terracotta hover:file:bg-orange-200 cursor-pointer">
+                  <img id="back-preview" class="w-full h-16 object-cover rounded-xl mt-1.5 hidden border border-slate-200">
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-[10px] font-bold text-slate-400 tracking-wider font-mono-label mb-1 uppercase">PROOF OF PROPERTY / LEASE PERMIT</label>
+                <input id="reg-property-proof" type="file" accept="image/*" onchange="previewImage(event, 'proof-preview')" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-orange-100 file:text-terracotta hover:file:bg-orange-200 cursor-pointer">
+                <img id="proof-preview" class="w-full h-16 object-cover rounded-xl mt-1.5 hidden border border-slate-200">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 tracking-wider font-mono-label mb-1 uppercase">PASSWORD</label>
+              <div class="relative">
+                <input id="reg-password" type="password" required minlength="8" placeholder="Min. 8 characters" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:bg-white focus-ring-terracotta transition pr-12">
+                <button type="button" onclick="togglePassword('reg-password')" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600 font-medium">Show</button>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 tracking-wider font-mono-label mb-1 uppercase">CONFIRM PASSWORD</label>
+              <div class="relative">
+                <input id="reg-confirm-password" type="password" required minlength="8" placeholder="Re-enter password" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:bg-white focus-ring-terracotta transition pr-12">
+                <button type="button" onclick="togglePassword('reg-confirm-password')" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600 font-medium">Show</button>
+              </div>
+            </div>
+
+            <button type="submit" id="btn-submit-register" class="w-full bg-terracotta bg-terracotta-hover text-white font-semibold py-3.5 rounded-2xl shadow-lg shadow-terracotta/20 transition-all mt-2">
+              Create Renter Account
+            </button>
+          </form>
+
+          <p class="text-center text-xs text-slate-500 mt-4">
+            Already have an account? <button onclick="switchToLogin()" class="text-terracotta font-semibold hover:underline">Sign in</button>
+          </p>
+        </div>
+
+      </div>
+
+      <div class="text-center text-xs text-slate-400 mt-8">
+        By continuing, you agree to Roomie Rent's <a href="#" class="underline">Terms</a> & <a href="#" class="underline">Privacy Policy</a>.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FORGOT PASSWORD MODAL -->
+  <div id="forgot-password-modal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold text-slate-950">Reset your password</h3>
+        <button onclick="closeForgotPasswordModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 transition">✕</button>
+      </div>
+      <p class="text-xs text-slate-500 leading-relaxed mb-6">Enter your account email address below and we'll send you instructions to reset your password.</p>
+      
+      <div id="forgot-alert" class="hidden mb-4 p-3 rounded-xl text-xs font-medium"></div>
+
+      <form id="form-forgot" onsubmit="handleForgotPassword(event)" class="space-y-4">
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 tracking-wider font-mono-label mb-1.5 uppercase">YOUR EMAIL ADDRESS</label>
+          <input id="forgot-email" type="email" required placeholder="ana@email.com" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:bg-white focus-ring-terracotta transition">
+        </div>
+        <button type="submit" class="w-full bg-terracotta bg-terracotta-hover text-white font-semibold py-3.5 rounded-2xl shadow-lg shadow-terracotta/20 transition-all">
+          Send Reset Instructions
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    let currentSelectedRole = 'renter';
+    let activeLoginRole = 'renter';
+    const API_BASE_URL = 'http://localhost:5000/api';
+
+    // Store base64 strings for uploaded credential images
+    let base64FrontId = '';
+    let base64BackId = '';
+    let base64PropertyProof = '';
+
+    const stepIndicator = document.getElementById('step-indicator');
+    const badgeStep1 = document.getElementById('badge-step1');
+    const textStep1 = document.getElementById('text-step1');
+    const stepLine = document.getElementById('step-line');
+    const badgeStep2 = document.getElementById('badge-step2');
+    const textStep2 = document.getElementById('text-step2');
+
+    const viewLogin = document.getElementById('view-login');
+    const viewRegStep1 = document.getElementById('view-reg-step1');
+    const viewRegStep2 = document.getElementById('view-reg-step2');
+
+    const pageTitle = document.getElementById('page-title');
+    const pageSubtitle = document.getElementById('page-subtitle');
+    const alertBox = document.getElementById('auth-alert');
+
+    function showAlert(message, isError = true) {
+      alertBox.textContent = message;
+      alertBox.className = `mb-4 p-3 rounded-xl text-xs font-medium ${isError ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-emerald-50 text-emerald-600 border border-emerald-200'}`;
+      alertBox.classList.remove('hidden');
+    }
+
+    function hideAlert() {
+      alertBox.classList.add('hidden');
+    }
+
+    function togglePassword(inputId) {
+      const input = document.getElementById(inputId);
+      input.type = input.type === 'password' ? 'text' : 'password';
+    }
+
+    function previewImage(event, previewId) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const preview = document.getElementById(previewId);
+        preview.src = e.target.result;
+        preview.classList.remove('hidden');
+
+        if (previewId === 'front-preview') base64FrontId = e.target.result;
+        if (previewId === 'back-preview') base64BackId = e.target.result;
+        if (previewId === 'proof-preview') base64PropertyProof = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function openForgotPasswordModal() {
+      document.getElementById('forgot-password-modal').classList.remove('hidden');
+      document.getElementById('forgot-email').value = document.getElementById('login-email').value || '';
+      document.getElementById('forgot-alert').classList.add('hidden');
+    }
+
+    function closeForgotPasswordModal() {
+      document.getElementById('forgot-password-modal').classList.add('hidden');
+    }
+
+    async function handleForgotPassword(event) {
+      event.preventDefault();
+      const email = document.getElementById('forgot-email').value;
+      const forgotAlert = document.getElementById('forgot-alert');
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Failed to send reset email.');
+
+        forgotAlert.textContent = 'Password reset instructions have been sent to your email!';
+        forgotAlert.className = 'mb-4 p-3 rounded-xl text-xs font-medium bg-emerald-50 text-emerald-600 border border-emerald-200';
+        forgotAlert.classList.remove('hidden');
+        setTimeout(() => closeForgotPasswordModal(), 2500);
+      } catch (err) {
+        forgotAlert.textContent = 'Password reset instructions have been sent to your email (if registered).';
+        forgotAlert.className = 'mb-4 p-3 rounded-xl text-xs font-medium bg-emerald-50 text-emerald-600 border border-emerald-200';
+        forgotAlert.classList.remove('hidden');
+        setTimeout(() => closeForgotPasswordModal(), 2500);
+      }
+    }
+
+    function switchToLogin() {
+      hideAlert();
+      stepIndicator.classList.add('hidden');
+      viewRegStep1.classList.add('hidden');
+      viewRegStep2.classList.add('hidden');
+      viewLogin.classList.remove('hidden');
+
+      pageTitle.innerText = "Welcome back";
+      pageSubtitle.innerText = "Sign in to manage your rental stays and inquiries.";
+    }
+
+    function switchToRegister() {
+      hideAlert();
+      stepIndicator.classList.remove('hidden');
+      viewLogin.classList.add('hidden');
+      goToStep1();
+    }
+
+    function setLoginRole(role) {
+      activeLoginRole = role;
+      const renterBtn = document.getElementById('login-role-renter');
+      const landlordBtn = document.getElementById('login-role-landlord');
+      const submitBtn = document.getElementById('login-submit-btn');
+
+      if (role === 'renter') {
+        renterBtn.className = "py-2.5 rounded-xl bg-white text-slate-900 shadow-sm transition-all";
+        landlordBtn.className = "py-2.5 rounded-xl text-slate-500 hover:text-slate-900 transition-all";
+        submitBtn.innerText = "Sign In as Renter";
+      } else {
+        landlordBtn.className = "py-2.5 rounded-xl bg-white text-slate-900 shadow-sm transition-all";
+        renterBtn.className = "py-2.5 rounded-xl text-slate-500 hover:text-slate-900 transition-all";
+        submitBtn.innerText = "Sign In as Landlord";
+      }
+    }
+
+    function selectRegisterRole(role) {
+      currentSelectedRole = role;
+      const cardRenter = document.getElementById('card-renter');
+      const cardLandlord = document.getElementById('card-landlord');
+      const infoBox = document.getElementById('info-box');
+      const btnContinue = document.getElementById('btn-continue-step1');
+
+      if (role === 'renter') {
+        cardRenter.className = "p-4 rounded-2xl border-2 text-left transition-all border-terracotta bg-orange-50/40";
+        cardLandlord.className = "p-4 rounded-2xl border-2 text-left transition-all border-slate-200 hover:border-slate-300";
+        infoBox.innerHTML = "As a Renter you can search listings, save favorites, and message landlords directly.";
+        btnContinue.innerHTML = "<span>Continue as Renter</span> <span>&rarr;</span>";
+      } else {
+        cardLandlord.className = "p-4 rounded-2xl border-2 text-left transition-all border-terracotta bg-orange-50/40";
+        cardRenter.className = "p-4 rounded-2xl border-2 text-left transition-all border-slate-200 hover:border-slate-300";
+        infoBox.innerHTML = "As a Landlord you can list properties, but your account requires valid Government ID & Property verification by admin before login access.";
+        btnContinue.innerHTML = "<span>Continue as Landlord</span> <span>&rarr;</span>";
+      }
+    }
+
+    function goToStep1() {
+      hideAlert();
+      viewRegStep1.classList.remove('hidden');
+      viewRegStep2.classList.add('hidden');
+      
+      pageTitle.innerText = "Create account";
+      pageSubtitle.innerText = "Join Roomie Rent";
+
+      badgeStep1.className = "w-7 h-7 rounded-full bg-terracotta text-white font-medium text-xs flex items-center justify-center shadow-sm";
+      textStep1.className = "text-xs font-semibold text-slate-800";
+      stepLine.className = "w-12 h-[2px] bg-stone-200 transition-colors";
+      badgeStep2.className = "w-7 h-7 rounded-full bg-stone-200 text-stone-500 font-medium text-xs flex items-center justify-center transition-colors";
+      textStep2.className = "text-xs font-medium text-stone-400 transition-colors";
+    }
+
+    function goToStep2() {
+      hideAlert();
+      viewRegStep1.classList.add('hidden');
+      viewRegStep2.classList.remove('hidden');
+
+      badgeStep1.className = "w-7 h-7 rounded-full bg-terracotta text-white font-medium text-xs flex items-center justify-center shadow-sm";
+      textStep1.className = "text-xs font-medium text-slate-600";
+      stepLine.className = "w-12 h-[2px] bg-terracotta transition-colors";
+      badgeStep2.className = "w-7 h-7 rounded-full bg-terracotta text-white font-medium text-xs flex items-center justify-center shadow-sm transition-colors";
+      textStep2.className = "text-xs font-semibold text-slate-800 transition-colors";
+
+      const badgeSelectedRole = document.getElementById('badge-selected-role');
+      const landlordLocationFields = document.getElementById('landlord-location-fields');
+      const landlordVerificationSection = document.getElementById('landlord-verification-section');
+      const btnSubmitRegister = document.getElementById('btn-submit-register');
+
+      if (currentSelectedRole === 'renter') {
+        badgeSelectedRole.className = "px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 flex items-center space-x-1.5";
+        badgeSelectedRole.innerHTML = "<span>👤</span> <span>Renter</span>";
+        landlordLocationFields.classList.add('hidden');
+        landlordVerificationSection.classList.add('hidden');
+        btnSubmitRegister.innerText = "Create Renter Account";
+      } else {
+        badgeSelectedRole.className = "px-2.5 py-1 rounded-full text-xs font-medium bg-teal-50 text-teal-700 flex items-center space-x-1.5";
+        badgeSelectedRole.innerHTML = "<span>🏢</span> <span>Landlord (Verification Required)</span>";
+        landlordLocationFields.classList.remove('hidden');
+        landlordVerificationSection.classList.remove('hidden');
+        btnSubmitRegister.innerText = "Submit Landlord Registration";
+      }
+    }
+
+    async function handleLogin(event) {
+      event.preventDefault();
+      hideAlert();
+
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, role: activeLoginRole })
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Failed to sign in.');
+
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+
+        if (data.user.role === 'landlord') {
+          window.location.href = 'landlord-dashboard.html';
+        } else if (data.user.role === 'admin') {
+          window.location.href = 'admin-dashboard.html';
+        } else {
+          window.location.href = 'renter-dashboard.html';
+        }
+      } catch (err) {
+        showAlert(err.message);
+      }
+    }
+
+    async function handleRegister(event) {
+      event.preventDefault();
+      hideAlert();
+
+      const name = document.getElementById('reg-name').value;
+      const email = document.getElementById('reg-email').value;
+      const phone = document.getElementById('reg-phone').value;
+      const password = document.getElementById('reg-password').value;
+      const confirmPassword = document.getElementById('reg-confirm-password').value;
+      const city = document.getElementById('reg-city')?.value || '';
+      const barangay = document.getElementById('reg-barangay')?.value || '';
+
+      const id_type = document.getElementById('reg-id-type')?.value || '';
+      const id_number = document.getElementById('reg-id-number')?.value || '';
+
+      if (password !== confirmPassword) {
+        showAlert('Passwords do not match. Please re-enter.');
+        return;
+      }
+
+      if (password.length < 8) {
+        showAlert('Password must be at least 8 characters long.');
+        return;
+      }
+
+      if (currentSelectedRole === 'landlord') {
+        if (!id_number || !base64FrontId || !base64BackId || !base64PropertyProof) {
+          showAlert('Landlords must provide valid ID details, front/back ID photos, and property proof for anti-scam verification.');
+          return;
+        }
+      }
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name, email, phone, password, role: currentSelectedRole,
+            city, barangay, id_type, id_number,
+            id_front_image: base64FrontId,
+            id_back_image: base64BackId,
+            property_proof_image: base64PropertyProof
+          })
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Failed to create account.');
+
+        showAlert(data.message, false);
+        setTimeout(() => {
+          switchToLogin();
+          document.getElementById('login-email').value = email;
+        }, 2500);
+      } catch (err) {
+        showAlert(err.message);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.location.hash === '#register') {
+        switchToRegister();
+      }
+    });
+  </script>
+</body>
+</html>
